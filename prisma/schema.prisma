@@ -1,0 +1,601 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  moduleFormat    = "cjs"
+  previewFeatures = ["fullTextSearchPostgres"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Enums
+// ────────────────────────────────────────────────────────────────────────
+
+enum Role {
+  USER
+  AGENT
+  ADMIN
+}
+
+enum Purpose {
+  SALE
+  RENT
+}
+
+enum PropertyType {
+  HOUSE
+  FLAT
+  UPPER_PORTION
+  LOWER_PORTION
+  PLOT
+  PLOT_FILE
+  COMMERCIAL_PLOT
+  SHOP
+  OFFICE
+  BUILDING
+  WAREHOUSE
+  FARMHOUSE
+  PENTHOUSE
+}
+
+enum PropertyCategory {
+  RESIDENTIAL
+  COMMERCIAL
+}
+
+enum PropertyStatus {
+  DRAFT
+  PENDING
+  ACTIVE
+  UNDER_OFFER
+  SOLD
+  RENTED
+  EXPIRED
+  REJECTED
+}
+
+enum RentPeriod {
+  MONTHLY
+  YEARLY
+}
+
+enum AreaUnit {
+  MARLA
+  KANAL
+  SQFT
+  SQYD
+}
+
+enum Furnishing {
+  FURNISHED
+  SEMI_FURNISHED
+  UNFURNISHED
+}
+
+enum Facing {
+  NORTH
+  SOUTH
+  EAST
+  WEST
+  NORTH_EAST
+  NORTH_WEST
+  SOUTH_EAST
+  SOUTH_WEST
+}
+
+enum Possession {
+  READY
+  UNDER_CONSTRUCTION
+  BALLOTED
+  FILE
+}
+
+enum FileType {
+  ALLOCATION
+  AFFIDAVIT
+  INTIMATION
+  TRANSFER
+  NA
+}
+
+enum LocationType {
+  CITY
+  SOCIETY
+  PHASE
+  BLOCK
+  SECTOR
+}
+
+enum Specialisation {
+  PLOTS
+  HOMES
+  RENTALS
+  COMMERCIAL
+  INVESTMENT
+  CONSTRUCTION
+}
+
+enum MediaKind {
+  IMAGE
+  FLOORPLAN
+  DOCUMENT
+}
+
+enum FileRateTrend {
+  UP
+  DOWN
+  FLAT
+}
+
+enum LeadSource {
+  FORM
+  WHATSAPP
+  CALL
+  CHAT
+  VALUATION
+  CONTACT_PAGE
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  VIEWING
+  NEGOTIATION
+  WON
+  LOST
+}
+
+enum AlertChannel {
+  EMAIL
+  WHATSAPP
+  BOTH
+}
+
+enum AlertFrequency {
+  INSTANT
+  DAILY
+  WEEKLY
+}
+
+enum ReviewSource {
+  SITE
+  GOOGLE
+}
+
+enum CareerType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+}
+
+enum ApplicationStatus {
+  NEW
+  REVIEWING
+  INTERVIEW
+  REJECTED
+  HIRED
+}
+
+enum ValuationStatus {
+  NEW
+  CONTACTED
+  COMPLETED
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Identity
+// ────────────────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  phone        String?
+  image        String?
+  role         Role     @default(USER)
+  passwordHash String?
+  locale       String   @default("en")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  agent           Agent?
+  savedProperties SavedProperty[]
+  savedSearches   SavedSearch[]
+  leadsAssigned   Lead[]          @relation("LeadAssignee")
+  posts           Post[]
+  auditLogs       AuditLog[]
+
+  @@index([role])
+}
+
+model Agent {
+  id              String           @id @default(cuid())
+  userId          String           @unique
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  slug            String           @unique
+  title           String
+  bio             String
+  photo           String
+  phone           String
+  whatsapp        String
+  email           String
+  specialisations Specialisation[]
+  languages       String[]
+  yearsExperience Int              @default(0)
+  areasServed     String[]
+  rating          Decimal          @default(0) @db.Decimal(2, 1)
+  reviewCount     Int              @default(0)
+  isFeatured      Boolean          @default(false)
+  socials         Json?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  properties Property[]
+  leads      Lead[]
+  reviews    Review[]
+
+  @@index([isFeatured])
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Locations
+// ────────────────────────────────────────────────────────────────────────
+
+model Location {
+  id               String       @id @default(cuid())
+  slug             String       @unique
+  name             String
+  nameUr           String?
+  type             LocationType
+  parentId         String?
+  parent           Location?    @relation("LocationHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children         Location[]   @relation("LocationHierarchy")
+  lat              Float?
+  lng              Float?
+  polygon          Json?
+  mapImageUrl      String?
+  description      String?
+  heroImage        String?
+  avgPricePerMarla BigInt?
+  popularityRank   Int?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  properties Property[]
+  fileRates  FileRate[]
+
+  @@index([parentId])
+  @@index([type])
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Catalog
+// ────────────────────────────────────────────────────────────────────────
+
+model Amenity {
+  id        String  @id @default(cuid())
+  slug      String  @unique
+  label     String
+  labelUr   String?
+  icon      String
+  category  String?
+  sortOrder Int     @default(0)
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Properties
+// ────────────────────────────────────────────────────────────────────────
+
+model Property {
+  id              String           @id @default(cuid())
+  refCode         String           @unique
+  slug            String           @unique
+  title           String
+  description     String
+  purpose         Purpose
+  type            PropertyType
+  category        PropertyCategory
+  status          PropertyStatus   @default(DRAFT)
+  price           BigInt
+  priceOnRequest  Boolean          @default(false)
+  rentPeriod      RentPeriod?
+  areaSqft        Int
+  areaUnitDisplay AreaUnit         @default(MARLA)
+  bedrooms        Int?
+  bathrooms       Int?
+  kitchens        Int?
+  floors          Int?
+  parking         Int?
+  yearBuilt       Int?
+  furnishing      Furnishing?
+  facing          Facing?
+  plotNo          String?
+  streetNo        String?
+  possession      Possession       @default(READY)
+  fileType        FileType?
+  locationId      String
+  location        Location         @relation(fields: [locationId], references: [id])
+  lat             Float?
+  lng             Float?
+  address         String
+  amenities       String[]
+  videoUrl        String?
+  tour360Url      String?
+  brochureUrl     String?
+  agentId         String
+  agent           Agent            @relation(fields: [agentId], references: [id])
+  isFeatured      Boolean          @default(false)
+  isHot           Boolean          @default(false)
+  isVerified      Boolean          @default(false)
+  viewCount       Int              @default(0)
+  saveCount       Int              @default(0)
+  leadCount       Int              @default(0)
+  publishedAt     DateTime?
+  expiresAt       DateTime?
+  seoTitle        String?
+  seoDescription  String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  media   Media[]
+  savedBy SavedProperty[]
+  leads   Lead[]
+
+  @@index([purpose, type, locationId, price])
+  @@index([lat, lng])
+  @@index([status])
+  @@index([agentId])
+}
+
+model Media {
+  id          String    @id @default(cuid())
+  url         String
+  publicId    String?
+  width       Int?
+  height      Int?
+  blurDataUrl String?
+  alt         String?
+  kind        MediaKind @default(IMAGE)
+  sortOrder   Int       @default(0)
+  isCover     Boolean   @default(false)
+  propertyId  String
+  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, sortOrder])
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// File rates
+// ────────────────────────────────────────────────────────────────────────
+
+model FileRate {
+  id            String        @id @default(cuid())
+  city          String
+  locationId    String
+  location      Location      @relation(fields: [locationId], references: [id])
+  phase         String
+  plotType      String
+  sizeLabel     String
+  areaSqft      Int
+  fileType      FileType
+  demandPkr     BigInt?
+  callForPrice  Boolean       @default(false)
+  trend         FileRateTrend @default(FLAT)
+  contactName   String
+  contactPhone  String
+  effectiveDate DateTime      @default(now())
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  history FileRateHistory[]
+
+  @@index([city, phase])
+}
+
+model FileRateHistory {
+  id            String   @id @default(cuid())
+  fileRateId    String
+  fileRate      FileRate @relation(fields: [fileRateId], references: [id], onDelete: Cascade)
+  demandPkr     BigInt?
+  effectiveDate DateTime
+
+  @@index([fileRateId, effectiveDate])
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Leads / CRM
+// ────────────────────────────────────────────────────────────────────────
+
+model Lead {
+  id                 String     @id @default(cuid())
+  propertyId         String?
+  property           Property?  @relation(fields: [propertyId], references: [id])
+  agentId            String?
+  agent              Agent?     @relation(fields: [agentId], references: [id])
+  name               String
+  phone              String
+  email              String?
+  message            String?
+  source             LeadSource
+  purpose            Purpose?
+  budgetMin          BigInt?
+  budgetMax          BigInt?
+  preferredLocations String[]
+  status             LeadStatus @default(NEW)
+  assignedToId       String?
+  assignedTo         User?      @relation("LeadAssignee", fields: [assignedToId], references: [id])
+  utm                Json?
+  ip                 String?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  notes LeadNote[]
+
+  @@index([status])
+  @@index([propertyId])
+  @@index([agentId])
+}
+
+model LeadNote {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Saved / account
+// ────────────────────────────────────────────────────────────────────────
+
+model SavedProperty {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, propertyId])
+}
+
+model SavedSearch {
+  id             String         @id @default(cuid())
+  userId         String
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String?
+  queryJson      Json
+  alertFrequency AlertFrequency @default(DAILY)
+  channel        AlertChannel   @default(EMAIL)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Reviews
+// ────────────────────────────────────────────────────────────────────────
+
+model Review {
+  id          String       @id @default(cuid())
+  source      ReviewSource @default(SITE)
+  authorName  String
+  authorImage String?
+  rating      Int
+  body        String
+  isApproved  Boolean      @default(false)
+  agentId     String?
+  agent       Agent?       @relation(fields: [agentId], references: [id])
+  createdAt   DateTime     @default(now())
+
+  @@index([isApproved])
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Content
+// ────────────────────────────────────────────────────────────────────────
+
+model Post {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  title          String
+  excerpt        String
+  contentMdx     String
+  coverImage     String
+  tags           String[]
+  authorId       String
+  author         User      @relation(fields: [authorId], references: [id])
+  readingMinutes Int       @default(4)
+  publishedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([publishedAt])
+}
+
+model Project {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  name           String
+  description    String
+  locationText   String
+  status         String
+  coverImage     String
+  gallery        String[]
+  completionDate DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Service {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  name           String
+  summary        String
+  descriptionMdx String
+  icon           String
+  gallery        String[]
+  packages       Json?
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Career {
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  title       String
+  department  String
+  location    String
+  type        CareerType @default(FULL_TIME)
+  description String
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+
+  applications CareerApplication[]
+}
+
+model CareerApplication {
+  id          String            @id @default(cuid())
+  careerId    String
+  career      Career            @relation(fields: [careerId], references: [id], onDelete: Cascade)
+  name        String
+  email       String
+  phone       String
+  cvUrl       String
+  coverLetter String?
+  status      ApplicationStatus @default(NEW)
+  createdAt   DateTime          @default(now())
+}
+
+model Valuation {
+  id           String          @id @default(cuid())
+  name         String
+  phone        String
+  email        String?
+  propertyType PropertyType
+  locationText String
+  sizeMarla    Float?
+  message      String?
+  status       ValuationStatus @default(NEW)
+  createdAt    DateTime        @default(now())
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Admin
+// ────────────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  action     String
+  entityType String
+  entityId   String
+  diff       Json?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+}

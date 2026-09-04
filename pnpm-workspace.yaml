@@ -1,0 +1,11 @@
+allowBuilds:
+  '@embedded-postgres/windows-x64': true
+  '@parcel/watcher': true
+  '@prisma/engines': true
+  '@swc/core': true
+  esbuild: true
+  msgpackr-extract: true
+  prisma: true
+  sharp: false
+  unrs-resolver: false
+  workerd: true
