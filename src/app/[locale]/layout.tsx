@@ -4,6 +4,8 @@ import { Inter, Plus_Jakarta_Sans, Noto_Nastaliq_Urdu } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { SessionProvider } from "next-auth/react";
+import { auth } from "@/lib/auth";
 import { routing, localeDirections, type Locale } from "@/i18n/routing";
 import { ThemeProvider } from "@/components/theme-provider";
 import { QueryProvider } from "@/components/query-provider";
@@ -12,6 +14,8 @@ import { Footer } from "@/components/layout/footer";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { FloatingCtas } from "@/components/layout/floating-ctas";
 import { CommandPalette } from "@/components/layout/command-palette";
+import { AdvisorChatWidget } from "@/features/chat/components/advisor-chat-widget";
+import { getAdvisorAgent } from "@/features/chat/server/queries";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { siteConfig } from "@/lib/site-config";
@@ -78,6 +82,7 @@ export default async function LocaleLayout({
 
   setRequestLocale(locale);
   const dir = localeDirections[locale as Locale];
+  const [advisorAgent, session] = await Promise.all([getAdvisorAgent(), auth()]);
 
   return (
     <html
@@ -91,25 +96,28 @@ export default async function LocaleLayout({
         <NextIntlClientProvider>
           <NuqsAdapter>
             <ThemeProvider>
-              <QueryProvider>
-                <TooltipProvider>
-                  <a
-                    href="#main-content"
-                    className="focus:bg-brand-900 sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:px-4 focus:py-2 focus:text-white"
-                  >
-                    Skip to content
-                  </a>
-                  <Header />
-                  <main id="main-content" className="flex-1">
-                    {children}
-                  </main>
-                  <Footer />
-                  <MobileNav />
-                  <FloatingCtas />
-                  <CommandPalette />
-                  <Toaster />
-                </TooltipProvider>
-              </QueryProvider>
+              <SessionProvider session={session}>
+                <QueryProvider>
+                  <TooltipProvider>
+                    <a
+                      href="#main-content"
+                      className="focus:bg-brand-900 sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:px-4 focus:py-2 focus:text-white"
+                    >
+                      Skip to content
+                    </a>
+                    <Header />
+                    <main id="main-content" className="flex-1">
+                      {children}
+                    </main>
+                    <Footer />
+                    <MobileNav />
+                    <FloatingCtas />
+                    <CommandPalette />
+                    <AdvisorChatWidget agent={advisorAgent} />
+                    <Toaster />
+                  </TooltipProvider>
+                </QueryProvider>
+              </SessionProvider>
             </ThemeProvider>
           </NuqsAdapter>
         </NextIntlClientProvider>

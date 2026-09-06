@@ -1,23 +1,28 @@
 "use client";
 
 import * as React from "react";
-import { Heart, Scale, LogIn } from "lucide-react";
+import { Heart, Scale } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useUiStore } from "@/lib/store/ui-store";
+import { useHasMounted } from "@/lib/hooks/use-has-mounted";
 import { MegaMenu } from "./mega-menu";
 import { MobileMenuSheet } from "./mobile-menu-sheet";
 import { ThemeToggle } from "./theme-toggle";
 import { LocaleSwitcher } from "./locale-switcher";
 import { Logo } from "./logo";
+import { UserMenu } from "./user-menu";
 
 export function Header() {
   const t = useTranslations("nav");
   const [scrolled, setScrolled] = React.useState(false);
-  const savedCount = useUiStore((s) => s.savedIds.length);
-  const compareCount = useUiStore((s) => s.compareIds.length);
+  const mounted = useHasMounted();
+  const storeSavedCount = useUiStore((s) => s.savedIds.length);
+  const storeCompareCount = useUiStore((s) => s.compareIds.length);
+  const savedCount = mounted ? storeSavedCount : 0;
+  const compareCount = mounted ? storeCompareCount : 0;
 
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -76,12 +81,7 @@ export function Header() {
 
           <LocaleSwitcher />
           <ThemeToggle />
-
-          <Button variant="ghost" size="icon" className="hidden sm:inline-flex" asChild>
-            <Link href="/login" aria-label={t("login")}>
-              <LogIn className="size-[18px]" />
-            </Link>
-          </Button>
+          <UserMenu />
 
           <Button size="sm" className="ml-1 hidden md:inline-flex" asChild>
             <Link href="/dashboard/listings/new">{t("listProperty")}</Link>

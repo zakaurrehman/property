@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { parsePropertySearchParams } from "@/features/property/schema";
 import { searchProperties } from "@/features/property/server/queries";
 import { SearchFilters } from "@/features/property/components/search-filters";
-import { PropertyGrid } from "@/features/property/components/property-grid";
+import { PropertySearchResults } from "@/features/property/components/property-search-results";
 import { PropertyPagination } from "@/features/property/components/property-pagination";
 
 export const metadata: Metadata = {
@@ -38,7 +38,7 @@ export default async function PropertiesPage({
       <SearchFilters />
 
       <div className="mt-6">
-        <PropertyGrid items={results.items} />
+        <PropertySearchResults items={results.items} />
       </div>
 
       <PropertyPagination

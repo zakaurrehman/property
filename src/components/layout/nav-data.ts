@@ -34,8 +34,8 @@ export const megaMenuColumns: NavColumn[] = [
   {
     titleKey: "locations",
     links: [
-      { labelKey: "locDhaPhases", href: "/areas/lahore/dha" },
-      { labelKey: "locEme", href: "/areas/lahore/eme" },
+      { labelKey: "locDhaPhases", href: "/areas/lahore/dha-lahore" },
+      { labelKey: "locEme", href: "/areas/lahore/eme-society" },
       { labelKey: "locRaya", href: "/areas/lahore/raya" },
       { labelKey: "locBahriaTown", href: "/areas/lahore/bahria-town" },
       { labelKey: "locModelTown", href: "/areas/lahore/model-town" },
@@ -61,6 +61,7 @@ export const megaMenuColumns: NavColumn[] = [
       { labelKey: "toolInvestmentCalc", href: "/tools/investment-calculator" },
       { labelKey: "toolMortgageCalc", href: "/tools/mortgage-calculator" },
       { labelKey: "toolAreaGuides", href: "/areas" },
+      { labelKey: "toolFreeValuation", href: "/valuation" },
     ],
   },
   {

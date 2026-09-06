@@ -7,7 +7,8 @@ search, plot files, agents, and an agency site in one app.
 
 Next.js 16 (App Router, RSC) · TypeScript strict · Tailwind CSS v4 + shadcn/ui
 (Radix) · PostgreSQL + Prisma 7 (driver adapters) · Zod + React Hook Form ·
-nuqs · Zustand · TanStack Query · Resend + React Email (Phase 5) · next-intl
+nuqs · Zustand · TanStack Query · MapLibre GL + OpenStreetMap + supercluster ·
+Resend + React Email · Upstash Ratelimit (in-memory fallback) · next-intl
 (en/ur, RTL) · Vitest + Playwright
 
 ## Getting started
@@ -90,15 +91,71 @@ This app is built in phases. Each phase ends with a green
       tests, idempotent seed script (~80 Lahore/DHA listings, 8 agents, 37
       file rates with 6-month history, reviews, blog, services, projects,
       careers, demo accounts).
-- [~] **Phase 3 — Listings core** (in progress): `PropertyCard`, `/properties`
-  search (filters, sort, pagination, real `?page=` links), `/properties/[slug]`
-  detail page (gallery/lightbox, spec grid, amenities, agent card, working
-  enquiry form → real `Lead` row), similar properties. Still open: map
-  view, saved searches, compare, recently-viewed.
-- [ ] Phase 4 — Map & advanced search (split view, clustering, draw search, compare)
-- [ ] Phase 5 — Leads (email/WhatsApp automation, advisor chat, rate limiting)
-- [ ] Phase 6 — Auth & dashboards (Auth.js, agent dashboard, admin panel)
-- [ ] Phase 7 — Content (file rates page, phase guides, blog, services, projects)
+- [x] **Phase 3 — Listings core**: `PropertyCard`, `/properties` search
+      (filters, sort, pagination, real `?page=` links), `/properties/[slug]`
+      detail page (gallery/lightbox, spec grid, amenities, agent card, working
+      enquiry form → real `Lead` row), similar properties.
+- [x] **Phase 4 — Map & advanced search**: list/split/map view toggle on
+      `/properties`, MapLibre + OpenStreetMap tiles with client-side
+      `supercluster` clustering (no worker dependency — see note below),
+      hover-sync between list and map, `/compare` (up to 4, difference
+      highlighting on price/area) and `/saved` backed by a Zustand +
+      localStorage store via `/api/properties/{compare,saved}`. Still open:
+      draw-a-polygon search, DB-backed saved searches (needs Phase 6 auth,
+      since `SavedSearch` requires a user).
+- [x] **Phase 5 — Leads**: property enquiry, contact (`/contact`), and free
+      valuation (`/valuation`) forms all create real DB rows and email the
+      agent/team + confirmation to the sender via Resend (gracefully no-ops
+      and logs when `RESEND_API_KEY` isn't set yet). Property Advisor chat
+      widget (quick-reply flow: intent → size → budget → contact → WhatsApp
+      handoff), openable from the floating button or the mobile "Chat" tab.
+      Rate limiting on every public POST (`lib/rate-limit.ts` — Upstash-backed,
+      in-memory fallback for local dev) and a honeypot field on contact/
+      valuation forms. Still open: LLM-grounded chat answers (`/api/chat`,
+      needs `CHAT_LLM_API_KEY`), Turnstile, careers application (needs
+      Phase 6's upload pipeline). The advisor widget's featured-agent lookup
+      (`getAdvisorAgent()`, called from the root layout on every page) is
+      wrapped in try/catch and falls back to `null` on any DB error, since a
+      decorative lookup should never be able to fail the whole page render.
+- [x] **Phase 6 — Auth & dashboards**: Auth.js v5 (Credentials + optional
+      Google OAuth) with a Prisma adapter and JWT sessions; `/login` and
+      `/register` pages, a role-aware header user menu, and RBAC route
+      protection in `proxy.ts` for `/dashboard` (AGENT/ADMIN) and `/admin`
+      (ADMIN only). Agent dashboard: overview stats, a listings table with
+      edit/delete, and a tabbed listing wizard (basics/location/details/photos)
+      with a searchable location combobox, an amenities picker, and Cloudinary
+      signed uploads (falls back to pasting image URLs when `CLOUDINARY_*`
+      isn't configured). New listings are created as `PENDING`; a leads inbox
+      lets agents update lead status. Admin panel: platform stats, a
+      moderation queue (approve → `ACTIVE`, reject → `REJECTED`), user list
+      with inline role changes (auto-creates an `Agent` profile on promotion
+      to AGENT), and an all-leads view. Verified end-to-end in a real browser
+      (register → admin approve → agent create-listing round trip).
+      Still open: careers application upload, LLM chat, Turnstile.
+- [x] **Phase 7 — Content**: `/file-rates` (DHA phase-by-phase demand rates,
+      grouped in an accordion, trend arrows, WhatsApp-to-contact per row).
+      `/areas` + `/areas/[...slug]` — society/phase guide pages driven by the
+      `Location` self-relation, with breadcrumbs and a phase picker; a
+      society-level guide (e.g. DHA Lahore) aggregates listings across every
+      descendant phase (`getPropertiesForLocationIds`), not just its own
+      `locationId`. `/agents` + `/agents/[slug]` (added to fix a dangling
+      link from the property detail page's contact card — agent profiles,
+      active listings, approved reviews). `/services` + `/services/[slug]`
+      and `/blog` + `/blog/[slug]` render DB-stored Markdown via
+      `react-markdown` + `@tailwindcss/typography` (the seeded content is
+      plain Markdown, not real MDX with embedded components, so a compiler
+      wasn't needed). `/projects` + `/projects/[slug]`. Verified live in a
+      browser — every index/detail route returns 200 with real seeded data
+      and zero console errors. Still open: `/about`, `/careers`, `/reviews`,
+      `/faq` (not part of this phase's scope, still 404).
+      Bugs found and fixed: an icon resolved via a function call (instead of
+      a direct object-literal lookup) still tripped the Phase 6 RSC-boundary
+      lint rule even inside a Server Component; an `onClick` on a `Link`
+      nested in a Radix `AccordionTrigger` violated the same Server→Client
+      boundary rule on `/file-rates` (fixed by restructuring, not patching);
+      a `<li key={area}>` broke on agents whose seeded `areasServed` has a
+      duplicate (seed's random `pick()` can choose the same phase twice).
+- [ ] Phase 8 — Tools (mortgage, ROI, valuation, price trends)
 - [ ] Phase 8 — Tools (mortgage, ROI, valuation, price trends)
 - [ ] Phase 9 — Polish (animation, dark mode/RTL/360px QA, SEO, PWA, Lighthouse)
 - [ ] Phase 10 — Ship (Playwright green, clean build, deploy)

@@ -42,10 +42,10 @@ const envSchema = z.object({
   TURNSTILE_SITE_KEY: z.string().optional(),
   TURNSTILE_SECRET_KEY: z.string().optional(),
 
-  // Maps (Phase 4)
+  // Maps (Phase 4) — raster tile URL template ({z}/{x}/{y})
   NEXT_PUBLIC_MAP_TILES_URL: z
     .string()
-    .default("https://demotiles.maplibre.org/style.json"),
+    .default("https://tile.openstreetmap.org/{z}/{x}/{y}.png"),
 
   // FX (Phase 10 currency toggle) — admin-editable fallback rates
   FX_USD_PER_PKR: z.coerce.number().positive().optional(),

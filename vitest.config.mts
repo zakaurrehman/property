@@ -5,10 +5,15 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["src/**/*.test.ts"],
+    setupFiles: ["./vitest.setup.ts"],
   },
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "./src"),
+      "server-only": path.resolve(
+        import.meta.dirname,
+        "./src/lib/__stubs__/server-only.ts",
+      ),
     },
   },
 });

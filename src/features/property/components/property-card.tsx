@@ -19,13 +19,28 @@ import { AreaBadge } from "@/components/shared/area-badge";
 import { formatRelativeDate } from "@/lib/format";
 import { buildTelLink, buildWhatsAppLink, propertyWhatsAppMessage } from "@/lib/whatsapp";
 import { useUiStore } from "@/lib/store/ui-store";
+import { useHasMounted } from "@/lib/hooks/use-has-mounted";
 import { cn } from "@/lib/utils";
 import type { PropertyCardData } from "../server/queries";
 
-export function PropertyCard({ property }: { property: PropertyCardData }) {
+export function PropertyCard({
+  property,
+  highlighted = false,
+  onHover,
+}: {
+  property: PropertyCardData;
+  highlighted?: boolean;
+  onHover?: (id: string | null) => void;
+}) {
   const cover = property.media[0];
-  const isSaved = useUiStore((s) => s.isSaved(property.id));
-  const isCompared = useUiStore((s) => s.isCompared(property.id));
+  // Saved/compare state lives in localStorage, which the server can't see —
+  // report the SSR-safe default (false) until after hydration so the first
+  // client render matches the server's markup exactly.
+  const mounted = useHasMounted();
+  const storeIsSaved = useUiStore((s) => s.isSaved(property.id));
+  const storeIsCompared = useUiStore((s) => s.isCompared(property.id));
+  const isSaved = mounted && storeIsSaved;
+  const isCompared = mounted && storeIsCompared;
   const toggleSaved = useUiStore((s) => s.toggleSaved);
   const toggleCompare = useUiStore((s) => s.toggleCompare);
 
@@ -34,8 +49,18 @@ export function PropertyCard({ property }: { property: PropertyCardData }) {
     .join(" › ");
 
   return (
-    <article className="group border-line bg-surface relative flex flex-col overflow-hidden rounded-2xl border shadow-sm transition-shadow hover:shadow-lg">
-      <div className="bg-surface-2 relative aspect-4/3 overflow-hidden">
+    <article
+      onMouseEnter={() => onHover?.(property.id)}
+      onMouseLeave={() => onHover?.(null)}
+      className={cn(
+        "group border-line bg-surface relative flex shrink-0 flex-col overflow-hidden rounded-2xl border shadow-sm transition-shadow hover:shadow-lg",
+        highlighted && "ring-accent-500 ring-2",
+      )}
+    >
+      {/* Fixed height rather than aspect-ratio: aspect-ratio's height
+          computation from width is unreliable for this box when it sits
+          inside deeply nested grids (e.g. the split-view results grid). */}
+      <div className="bg-surface-2 relative h-48 overflow-hidden">
         <Link
           href={`/properties/${property.slug}`}
           className="relative block h-full w-full"

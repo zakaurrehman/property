@@ -204,3 +204,25 @@ export async function getSimilarProperties(
   });
   return items.map(serializePropertyCard);
 }
+
+const MAX_COMPARE = 4;
+
+/** Up to 4 properties by id, for the compare page. Order is not guaranteed to match input. */
+export async function getPropertiesByIds(ids: string[]): Promise<PropertyDetailData[]> {
+  if (ids.length === 0) return [];
+  const items = await db.property.findMany({
+    where: { id: { in: ids.slice(0, MAX_COMPARE) } },
+    include: propertyDetailInclude,
+  });
+  return items.map(serializePropertyDetail);
+}
+
+/** Card-shaped properties by id, for the saved-properties page. */
+export async function getPropertyCardsByIds(ids: string[]): Promise<PropertyCardData[]> {
+  if (ids.length === 0) return [];
+  const items = await db.property.findMany({
+    where: { id: { in: ids } },
+    include: propertyCardInclude,
+  });
+  return items.map(serializePropertyCard);
+}

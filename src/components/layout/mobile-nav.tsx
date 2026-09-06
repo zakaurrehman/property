@@ -4,6 +4,7 @@ import { Search, Heart, MapPin, MessageCircle, User } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
+import { useUiStore } from "@/lib/store/ui-store";
 import { mobileNavItems } from "./nav-data";
 
 const icons = { Search, Heart, MapPin, MessageCircle, User };
@@ -11,6 +12,7 @@ const icons = { Search, Heart, MapPin, MessageCircle, User };
 export function MobileNav() {
   const t = useTranslations("mobileNav");
   const pathname = usePathname();
+  const toggleChat = useUiStore((s) => s.toggleChat);
 
   return (
     <nav
@@ -25,12 +27,17 @@ export function MobileNav() {
           isActive ? "text-accent-600" : "text-ink-400",
         );
 
-        if (item.href.startsWith("#")) {
+        if (item.href === "#advisor-chat") {
           return (
-            <a key={item.href} href={item.href} className={linkClassName}>
+            <button
+              key={item.href}
+              type="button"
+              onClick={toggleChat}
+              className={linkClassName}
+            >
               <Icon className="size-5" />
               {t(item.labelKey)}
-            </a>
+            </button>
           );
         }
 

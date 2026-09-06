@@ -30,3 +30,9 @@ function startOfDay(date: Date): Date {
 export function formatReadingTime(minutes: number): string {
   return `${minutes} min read`;
 }
+
+/** "UPPER_PORTION" -> "Upper portion" — for rendering Prisma enum values as option labels. */
+export function formatEnumLabel(value: string): string {
+  const words = value.split("_").map((w) => w.toLowerCase());
+  return words.map((w, i) => (i === 0 ? w[0].toUpperCase() + w.slice(1) : w)).join(" ");
+}

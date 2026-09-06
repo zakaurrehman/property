@@ -4,11 +4,15 @@ import { persist } from "zustand/middleware";
 interface UiState {
   savedIds: string[];
   compareIds: string[];
+  isChatOpen: boolean;
   toggleSaved: (propertyId: string) => void;
   toggleCompare: (propertyId: string) => void;
   isSaved: (propertyId: string) => boolean;
   isCompared: (propertyId: string) => boolean;
   clearCompare: () => void;
+  openChat: () => void;
+  closeChat: () => void;
+  toggleChat: () => void;
 }
 
 const MAX_COMPARE = 4;
@@ -18,6 +22,7 @@ export const useUiStore = create<UiState>()(
     (set, get) => ({
       savedIds: [],
       compareIds: [],
+      isChatOpen: false,
       toggleSaved: (propertyId) =>
         set((state) => ({
           savedIds: state.savedIds.includes(propertyId)
@@ -35,7 +40,15 @@ export const useUiStore = create<UiState>()(
       isSaved: (propertyId) => get().savedIds.includes(propertyId),
       isCompared: (propertyId) => get().compareIds.includes(propertyId),
       clearCompare: () => set({ compareIds: [] }),
+      openChat: () => set({ isChatOpen: true }),
+      closeChat: () => set({ isChatOpen: false }),
+      toggleChat: () => set((state) => ({ isChatOpen: !state.isChatOpen })),
     }),
-    { name: "estate-bureau-ui" },
+    {
+      name: "estate-bureau-ui",
+      // Chat open/closed is a transient UI state, not something to persist
+      // or reopen on the next visit.
+      partialize: (state) => ({ savedIds: state.savedIds, compareIds: state.compareIds }),
+    },
   ),
 );
