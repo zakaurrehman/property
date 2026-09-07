@@ -16,6 +16,10 @@ export default defineConfig({
   },
   datasource: {
     url: env("DATABASE_URL"),
-    shadowDatabaseUrl: env("SHADOW_DATABASE_URL"),
+    // Only used by `prisma migrate dev` to diff schema changes locally —
+    // `generate` and `migrate deploy` (what Vercel's postinstall/vercel-build
+    // run) never touch it. `env()` resolves eagerly and throws if unset, so
+    // use plain process.env here to keep it optional everywhere else.
+    shadowDatabaseUrl: process.env.SHADOW_DATABASE_URL,
   },
 });
