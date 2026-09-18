@@ -17,6 +17,7 @@ jobs:
       # Build-time only — nothing queries the database during `next build`
       # (every data route is dynamic and the sitemap is request-time).
       DATABASE_URL: "postgres://user:pass@localhost:5432/ci?sslmode=disable"
+      AUTH_SECRET: "ci-only-secret-not-used-anywhere-else"
     steps:
       - uses: actions/checkout@v4
 

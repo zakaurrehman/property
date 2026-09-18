@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,7 +22,7 @@ import { loginSchema, type LoginInput } from "../schema";
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const callbackUrl = searchParams.get("callbackUrl");
   const [serverError, setServerError] = React.useState<string | null>(null);
 
   const form = useForm<LoginInput>({
@@ -45,7 +45,13 @@ export function LoginForm() {
       setServerError("We couldn't sign you in right now — please try again in a moment.");
       return;
     }
-    router.push(callbackUrl);
+    // Honour an explicit callbackUrl (the proxy sets one when it bounces a
+    // guarded route to /login); otherwise send each role to its own home so
+    // an admin who signs in from the header doesn't land on the marketing
+    // page and have to find /admin by hand.
+    const role = (await getSession())?.user.role;
+    const home = role === "ADMIN" ? "/admin" : role === "AGENT" ? "/dashboard" : "/";
+    router.push(callbackUrl || home);
     router.refresh();
   }
 

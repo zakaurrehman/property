@@ -19,10 +19,15 @@ const envSchema = z.object({
   NEXT_PUBLIC_CONTACT_EMAIL: z.string().email().default("info@estatebureau.pk"),
 
   // Database
-  DATABASE_URL: z.string().min(1, "DATABASE_URL is required — see .env.example"),
+  DATABASE_URL: z.string({ error: "DATABASE_URL is required — see .env.example" }).min(1),
 
-  // Auth.js (Phase 6)
-  AUTH_SECRET: z.string().optional(),
+  // Auth.js (Phase 6). Required: without it Auth.js throws MissingSecret on
+  // every /api/auth/* request in production, which surfaces as the generic
+  // "There is a problem with the server configuration" page — far harder to
+  // diagnose than a failed build naming the variable.
+  AUTH_SECRET: z
+    .string({ error: "AUTH_SECRET is required — generate one with `npx auth secret`" })
+    .min(1),
   AUTH_GOOGLE_ID: z.string().optional(),
   AUTH_GOOGLE_SECRET: z.string().optional(),
 

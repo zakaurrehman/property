@@ -8,28 +8,42 @@ import { omitEmptyValues } from "./env-normalize";
 const envSchema = z.object({
   NEXT_PUBLIC_SITE_URL: z.string().url().default("http://localhost:3000"),
   DATABASE_URL: z.string().optional(),
-  AUTH_SECRET: z.string().optional(),
+  AUTH_SECRET: z.string().min(1),
+  AUTH_GOOGLE_ID: z.string().optional(),
   FX_USD_PER_PKR: z.coerce.number().positive().optional(),
 });
 
+const required = { AUTH_SECRET: "test-secret" };
+
 describe("env schema", () => {
   it("defaults NEXT_PUBLIC_SITE_URL when unset", () => {
-    const parsed = envSchema.parse({});
+    const parsed = envSchema.parse(required);
     expect(parsed.NEXT_PUBLIC_SITE_URL).toBe("http://localhost:3000");
   });
 
   it("leaves phase-gated secrets optional", () => {
-    const parsed = envSchema.parse({});
+    const parsed = envSchema.parse(required);
     expect(parsed.DATABASE_URL).toBeUndefined();
-    expect(parsed.AUTH_SECRET).toBeUndefined();
+    expect(parsed.AUTH_GOOGLE_ID).toBeUndefined();
+  });
+
+  // A blank AUTH_SECRET on the host used to pass validation and then take
+  // down every /api/auth/* route at runtime with Auth.js's MissingSecret.
+  it("requires AUTH_SECRET, including when it is saved blank", () => {
+    expect(() => envSchema.parse({})).toThrow(/AUTH_SECRET/);
+    expect(() => envSchema.parse(omitEmptyValues({ AUTH_SECRET: "" }))).toThrow(
+      /AUTH_SECRET/,
+    );
   });
 
   it("rejects a malformed site URL", () => {
-    expect(() => envSchema.parse({ NEXT_PUBLIC_SITE_URL: "not-a-url" })).toThrow();
+    expect(() =>
+      envSchema.parse({ ...required, NEXT_PUBLIC_SITE_URL: "not-a-url" }),
+    ).toThrow();
   });
 
   it("coerces numeric FX rate strings", () => {
-    const parsed = envSchema.parse({ FX_USD_PER_PKR: "0.0036" });
+    const parsed = envSchema.parse({ ...required, FX_USD_PER_PKR: "0.0036" });
     expect(parsed.FX_USD_PER_PKR).toBeCloseTo(0.0036);
   });
 
@@ -38,7 +52,7 @@ describe("env schema", () => {
   // .url()/.positive() reject it.
   it("rejects blank values when passed through raw", () => {
     expect(() =>
-      envSchema.parse({ NEXT_PUBLIC_SITE_URL: "", FX_USD_PER_PKR: "" }),
+      envSchema.parse({ ...required, NEXT_PUBLIC_SITE_URL: "", FX_USD_PER_PKR: "" }),
     ).toThrow();
   });
 
@@ -47,13 +61,13 @@ describe("env schema", () => {
       omitEmptyValues({
         NEXT_PUBLIC_SITE_URL: "",
         FX_USD_PER_PKR: "   ",
-        AUTH_SECRET: "",
+        AUTH_SECRET: "real-secret",
         DATABASE_URL: "postgres://real",
       }),
     );
     expect(parsed.NEXT_PUBLIC_SITE_URL).toBe("http://localhost:3000");
     expect(parsed.FX_USD_PER_PKR).toBeUndefined();
-    expect(parsed.AUTH_SECRET).toBeUndefined();
+    expect(parsed.AUTH_SECRET).toBe("real-secret");
     expect(parsed.DATABASE_URL).toBe("postgres://real");
   });
 });

@@ -8,10 +8,9 @@ async function loginAsAdmin(page: Page) {
   await page.getByLabel("Email").fill(ADMIN.email);
   await page.getByLabel("Password").fill(ADMIN.password);
   await page.getByRole("button", { name: "Log in" }).click();
-  await page.waitForURL((u) => !u.pathname.endsWith("/login"));
-  // Prove the session actually exists — an unauthenticated /admin quietly
-  // redirects to a perfectly healthy-looking login page.
-  await page.goto("/admin");
+  // Admins land on /admin without a callbackUrl. Asserting the heading too
+  // proves the session exists — an unauthenticated /admin quietly redirects
+  // to a perfectly healthy-looking login page.
   await expect(page).toHaveURL(/\/admin$/);
   await expect(page.getByRole("heading", { name: "Admin overview" })).toBeVisible();
 }

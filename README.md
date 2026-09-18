@@ -31,22 +31,23 @@ Prisma Postgres instead (see `.env.example`).
 
 ## Scripts
 
-| Script                         | Purpose                             |
-| ------------------------------ | ----------------------------------- |
-| `pnpm dev`                     | Start the dev server                |
-| `pnpm build`                   | Production build                    |
-| `pnpm start`                   | Run the production build            |
-| `pnpm lint` / `lint:fix`       | ESLint                              |
-| `pnpm format` / `format:check` | Prettier                            |
-| `pnpm typecheck`               | `tsc --noEmit`                      |
-| `pnpm test:unit`               | Vitest                              |
-| `pnpm test:e2e`                | Playwright e2e (needs a seeded DB)  |
-| `pnpm db:dev`                  | Start local Postgres (`prisma dev`) |
-| `pnpm db:migrate`              | Create/apply a migration            |
-| `pnpm db:generate`             | Regenerate the Prisma client        |
-| `pnpm db:seed`                 | Seed demo data                      |
-| `pnpm db:studio`               | Prisma Studio (visual data browser) |
-| `pnpm db:reset`                | Drop + re-migrate + re-seed         |
+| Script                         | Purpose                              |
+| ------------------------------ | ------------------------------------ |
+| `pnpm dev`                     | Start the dev server                 |
+| `pnpm build`                   | Production build                     |
+| `pnpm start`                   | Run the production build             |
+| `pnpm lint` / `lint:fix`       | ESLint                               |
+| `pnpm format` / `format:check` | Prettier                             |
+| `pnpm typecheck`               | `tsc --noEmit`                       |
+| `pnpm test:unit`               | Vitest                               |
+| `pnpm test:e2e`                | Playwright e2e (needs a seeded DB)   |
+| `pnpm db:dev`                  | Start local Postgres (`prisma dev`)  |
+| `pnpm db:migrate`              | Create/apply a migration             |
+| `pnpm db:generate`             | Regenerate the Prisma client         |
+| `pnpm db:seed`                 | Seed demo data                       |
+| `pnpm db:create-admin`         | Create/promote one admin (prod-safe) |
+| `pnpm db:studio`               | Prisma Studio (visual data browser)  |
+| `pnpm db:reset`                | Drop + re-migrate + re-seed          |
 
 ## Environment variables
 
@@ -248,7 +249,8 @@ copy as a built-in fallback until it's edited in `/admin/pages`.
 
 ## Demo accounts
 
-Seeded by `pnpm db:seed`, password `password123` for all:
+Seeded by `pnpm db:seed` (local development only — it wipes the database
+first), password `password123` for all:
 
 | Role  | Email                       |
 | ----- | --------------------------- |
@@ -256,11 +258,27 @@ Seeded by `pnpm db:seed`, password `password123` for all:
 | Agent | bilal-ahmed@estatebureau.pk |
 | User  | buyer@estatebureau.pk       |
 
-Login isn't wired up yet (Phase 6) — these accounts exist in the DB with a
-hashed password ready for when Auth.js lands.
+Sign in at `/login`. Admins land on `/admin`, agents on `/dashboard`;
+`src/proxy.ts` enforces the role on every request under those prefixes.
 
 ## Deploy
 
-Target: Vercel. Connect the repo, set the env vars from `.env.example`, add a
-production Postgres database (Neon/Supabase/Prisma Postgres), run
-`prisma migrate deploy`, and deploy.
+Target: Vercel. Connect the repo, add a production Postgres database
+(Neon/Supabase/Prisma Postgres) and set the env vars from `.env.example`.
+`AUTH_SECRET` is required — the build fails if it is blank, because Auth.js
+would otherwise answer every `/api/auth/*` request with a generic "server
+configuration" error. The `vercel-build` script runs `prisma migrate deploy`
+before `next build`, so the schema is applied on each deploy.
+
+A production database starts empty and the demo seed is not meant for it.
+Create the first admin from your machine, pointed at the production
+`DATABASE_URL` (copy it from Vercel → Settings → Environment Variables):
+
+```powershell
+$env:DATABASE_URL = "postgres://…"   # bash: export DATABASE_URL="postgres://…"
+pnpm db:create-admin --email you@example.com --password "a long passphrase" --name "Your Name"
+```
+
+Running it again for the same email promotes the account to admin and
+replaces the password. Everything else — locations, listings, file rates,
+pages, FAQs, team — is entered through `/admin`.
