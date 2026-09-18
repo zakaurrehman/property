@@ -8,6 +8,12 @@ config({ path: ".env.local", override: true });
 
 import { defineConfig, env } from "prisma/config";
 
+// Only used by `prisma migrate dev` to diff schema changes locally. On Vercel
+// the variable is either unset or saved as an empty string, and `migrate
+// deploy` rejects an explicit "" with P1013 ("must not be an empty string"),
+// so the key has to be left out entirely unless there's a real value.
+const shadowDatabaseUrl = process.env.SHADOW_DATABASE_URL?.trim() || undefined;
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
@@ -16,10 +22,6 @@ export default defineConfig({
   },
   datasource: {
     url: env("DATABASE_URL"),
-    // Only used by `prisma migrate dev` to diff schema changes locally —
-    // `generate` and `migrate deploy` (what Vercel's postinstall/vercel-build
-    // run) never touch it. `env()` resolves eagerly and throws if unset, so
-    // use plain process.env here to keep it optional everywhere else.
-    shadowDatabaseUrl: process.env.SHADOW_DATABASE_URL,
+    ...(shadowDatabaseUrl ? { shadowDatabaseUrl } : {}),
   },
 });
