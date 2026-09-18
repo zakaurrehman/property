@@ -176,13 +176,36 @@ This app is built in phases. Each phase ends with a green
       (create → edit → public page reflects it → delete, per type). Still
       hardcoded, not admin-editable: office address/hours on `/contact` and
       the footer, and `NEXT_PUBLIC_*` contact numbers (env vars).
-- [ ] Phase 8 — Tools (mortgage, ROI, valuation, price trends)
+- [x] **Remaining routes + Phase 8 tools** (2026-09-18): every header/footer
+      link now resolves. `/about`, `/privacy`, `/terms` read Markdown from a
+      new `SitePage` model (edited at `/admin/pages`; built-in default copy
+      in `features/site-page/defaults.ts` is the fallback when no row exists,
+      so the routes never blank on an un-reseeded DB). `/faq` is a new `Faq`
+      model (categories, ordering, publish toggle; `/admin/faqs`). `/reviews`
+      lists approved reviews with a rating breakdown and a public "leave a
+      review" form that lands hidden for approval. `/careers` +
+      `/careers/[slug]` list open jobs with an application form (CV as a
+      link; applications + status pipeline at `/admin/careers`). `/profile`
+      edits name/phone and password. `/maps` is a 308 to
+      `/properties?view=map` in `next.config.ts` — a page-level
+      `redirect()` can only emit a 1s meta-refresh once the root layout has
+      started streaming, which is also why `/profile` is gated in `proxy.ts`.
+      Tools: `/tools/mortgage-calculator`, `/tools/investment-calculator`
+      (pure functions in `lib/finance.ts`, unit-tested against known
+      amortisation values) and `/tools/price-trends` (Recharts over
+      `FileRateHistory`, phase filter, table view). Chart colours are
+      `--chart-1..6` tokens validated for colour-blind separation on both
+      surfaces; charts are forced LTR so axis text doesn't bidi-flip in Urdu.
+      Verified: 80-route browser sweep (anonymous + admin), 53 unit tests,
+      clean build. Still open from Phase 8: valuation _tool_ (the
+      `/valuation` request form exists; an instant estimate from file rates
+      does not).
 - [ ] Phase 9 — Polish (animation, dark mode/RTL/360px QA, SEO, PWA, Lighthouse)
 - [ ] Phase 10 — Ship (Playwright green, clean build, deploy)
 
-Header/footer links that still 404 until their phase lands: `/about`,
-`/careers`, `/reviews`, `/faq`, `/profile`, `/maps`, and the `/tools/*`
-calculators (Phase 8).
+Every header/footer link resolves. Run `pnpm db:seed` on a fresh database to
+get the starter FAQs and site-page copy; an existing database gets the same
+copy as a built-in fallback until it's edited in `/admin/pages`.
 
 ## Demo accounts
 

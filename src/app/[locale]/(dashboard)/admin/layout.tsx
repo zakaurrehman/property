@@ -15,6 +15,9 @@ const navItems: DashboardNavItem[] = [
   { href: "/admin/services", label: "Services", icon: "services" },
   { href: "/admin/projects", label: "Projects", icon: "building" },
   { href: "/admin/reviews", label: "Reviews", icon: "reviews" },
+  { href: "/admin/faqs", label: "FAQs", icon: "faqs" },
+  { href: "/admin/careers", label: "Careers", icon: "careers" },
+  { href: "/admin/pages", label: "Site Pages", icon: "pages" },
   { href: "/admin/users", label: "Users", icon: "users" },
   { href: "/admin/leads", label: "Leads", icon: "inbox" },
 ];

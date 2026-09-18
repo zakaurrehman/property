@@ -8,6 +8,8 @@ const intlMiddleware = createIntlMiddleware(routing);
 /** Route prefixes after stripping any locale prefix. */
 const AGENT_OR_ADMIN_PREFIX = "/dashboard";
 const ADMIN_ONLY_PREFIX = "/admin";
+/** Any signed-in role. A 307 here beats the 1s meta-refresh a page-level redirect() would emit. */
+const SIGNED_IN_PREFIX = "/profile";
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
@@ -19,7 +21,9 @@ export default auth((req) => {
   const path = localeMatch ? pathname.slice(localeMatch[0].length) || "/" : pathname;
 
   const needsAuth =
-    path.startsWith(AGENT_OR_ADMIN_PREFIX) || path.startsWith(ADMIN_ONLY_PREFIX);
+    path.startsWith(AGENT_OR_ADMIN_PREFIX) ||
+    path.startsWith(ADMIN_ONLY_PREFIX) ||
+    path.startsWith(SIGNED_IN_PREFIX);
 
   if (needsAuth && !req.auth?.user) {
     const signInUrl = new URL(`${localePrefix}/login`, req.nextUrl);

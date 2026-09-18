@@ -581,6 +581,28 @@ model Service {
   updatedAt      DateTime @updatedAt
 }
 
+/// Editable site copy for fixed routes (about, privacy, terms) — Markdown body.
+model SitePage {
+  id         String   @id @default(cuid())
+  slug       String   @unique
+  title      String
+  contentMdx String
+  updatedAt  DateTime @updatedAt
+}
+
+model Faq {
+  id          String   @id @default(cuid())
+  question    String
+  answer      String
+  category    String   @default("General")
+  sortOrder   Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isPublished, category, sortOrder])
+}
+
 model Career {
   id          String     @id @default(cuid())
   slug        String     @unique

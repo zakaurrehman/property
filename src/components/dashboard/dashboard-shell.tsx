@@ -17,6 +17,9 @@ import {
   Newspaper,
   Wrench,
   Star,
+  HelpCircle,
+  Briefcase,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -46,6 +49,9 @@ const iconMap = {
   posts: Newspaper,
   services: Wrench,
   reviews: Star,
+  faqs: HelpCircle,
+  careers: Briefcase,
+  pages: FileText,
 } as const;
 
 export type DashboardIconKey = keyof typeof iconMap;

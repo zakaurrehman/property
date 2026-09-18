@@ -40,6 +40,16 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  async redirects() {
+    // The map explorer is /properties?view=map; "/maps" only exists because the
+    // header/footer link predates it. A config redirect is a real 308 — a
+    // redirect() inside a page can only emit a meta-refresh once the root
+    // layout has started streaming.
+    return [
+      { source: "/maps", destination: "/properties?view=map", permanent: true },
+      { source: "/ur/maps", destination: "/ur/properties?view=map", permanent: true },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);

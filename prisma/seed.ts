@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { amenityCatalog } from "../src/lib/amenity-catalog";
+import { faqDefaults, sitePageDefaults } from "../src/features/site-page/defaults";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const db = new PrismaClient({ adapter });
@@ -42,6 +43,8 @@ async function main() {
 
   // Clean in FK-safe order so the script is idempotent.
   await db.$transaction([
+    db.faq.deleteMany(),
+    db.sitePage.deleteMany(),
     db.careerApplication.deleteMany(),
     db.career.deleteMany(),
     db.leadNote.deleteMany(),
@@ -935,6 +938,24 @@ async function main() {
       type: "FULL_TIME" as const,
       description: `We're hiring a ${c.title} to join our ${c.department} team in Lahore. Prior DHA-market experience preferred but not required.`,
       isActive: true,
+    })),
+  });
+
+  // ── Site pages + FAQs ────────────────────────────────────────────────
+  await db.sitePage.createMany({
+    data: Object.entries(sitePageDefaults).map(([slug, page]) => ({
+      slug,
+      title: page.title,
+      contentMdx: page.contentMdx,
+    })),
+  });
+  await db.faq.createMany({
+    data: faqDefaults.map((f, i) => ({
+      question: f.question,
+      answer: f.answer,
+      category: f.category,
+      sortOrder: i,
+      isPublished: true,
     })),
   });
 

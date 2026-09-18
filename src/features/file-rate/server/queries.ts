@@ -120,6 +120,47 @@ export async function getFileRateForEdit(id: string): Promise<AdminFileRateRow |
   };
 }
 
+export interface TrendSeries {
+  /** "Residential · 10 Marla · Allocation" — one line per rate. */
+  id: string;
+  label: string;
+  points: { date: string; value: number }[];
+}
+
+export interface PhaseTrends {
+  phase: string;
+  series: TrendSeries[];
+}
+
+/** Every phase's rate history, for /tools/price-trends. Null demands are skipped. */
+export async function getFileRateTrends(city = "Lahore"): Promise<PhaseTrends[]> {
+  const rates = await db.fileRate.findMany({
+    where: { city },
+    orderBy: [{ phase: "asc" }, { plotType: "asc" }, { areaSqft: "asc" }],
+    include: { history: { orderBy: { effectiveDate: "asc" } } },
+  });
+
+  const byPhase = new Map<string, PhaseTrends>();
+  for (const rate of rates) {
+    const points = rate.history
+      .filter((h) => h.demandPkr !== null)
+      .map((h) => ({
+        date: h.effectiveDate.toISOString().slice(0, 10),
+        value: Number(h.demandPkr),
+      }));
+    if (points.length < 2) continue; // a single point isn't a trend
+
+    if (!byPhase.has(rate.phase))
+      byPhase.set(rate.phase, { phase: rate.phase, series: [] });
+    byPhase.get(rate.phase)!.series.push({
+      id: rate.id,
+      label: `${rate.plotType} · ${rate.sizeLabel} · ${rate.fileType.charAt(0)}${rate.fileType.slice(1).toLowerCase()}`,
+      points,
+    });
+  }
+  return Array.from(byPhase.values());
+}
+
 export interface FileRateHistoryPoint {
   demandPkr: number | null;
   effectiveDate: Date;

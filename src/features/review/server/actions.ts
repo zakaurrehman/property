@@ -3,8 +3,54 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/guards";
+import { getClientIp } from "@/lib/get-client-ip";
+import { rateLimit } from "@/lib/rate-limit";
 import type { ActionResult } from "@/types/action-result";
-import { reviewFormSchema, type ReviewFormInput } from "../schema";
+import {
+  publicReviewSchema,
+  reviewFormSchema,
+  type PublicReviewInput,
+  type ReviewFormInput,
+} from "../schema";
+
+/** Public submission from /reviews. Created hidden; admin approves on /admin/reviews. */
+export async function submitPublicReview(
+  input: PublicReviewInput,
+): Promise<ActionResult<{ id: string }>> {
+  const ip = await getClientIp();
+  const { success } = await rateLimit(`review:${ip}`, { limit: 3, windowMs: 60_000 });
+  if (!success) {
+    return { ok: false, error: "Too many submissions — please try again in a minute." };
+  }
+
+  const parsed = publicReviewSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: "Please check the highlighted fields.",
+      fieldErrors: parsed.error.flatten().fieldErrors,
+    };
+  }
+  if (parsed.data.company) {
+    // Honeypot tripped — pretend success so the bot moves on.
+    return { ok: true, data: { id: "discarded" } };
+  }
+
+  const { authorName, rating, body, agentId } = parsed.data;
+  const review = await db.review.create({
+    data: {
+      authorName,
+      rating,
+      body,
+      source: "SITE",
+      agentId: agentId || null,
+      isApproved: false,
+    },
+  });
+
+  revalidatePath("/admin/reviews");
+  return { ok: true, data: { id: review.id } };
+}
 
 /**
  * Agent.rating / reviewCount are denormalised from approved reviews so the

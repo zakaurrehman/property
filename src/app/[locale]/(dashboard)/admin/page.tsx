@@ -103,4 +103,11 @@ const contentLinks = [
     label: "Reviews",
     description: "Testimonials and agent ratings",
   },
+  { href: "/admin/faqs", label: "FAQs", description: "Questions on /faq" },
+  { href: "/admin/careers", label: "Careers", description: "Job posts and applications" },
+  {
+    href: "/admin/pages",
+    label: "Site pages",
+    description: "About, privacy, terms copy",
+  },
 ];
