@@ -50,6 +50,57 @@ export default async function AdminOverviewPage() {
           {stats.newLeadsToday === 1 ? "" : "s"} today.
         </p>
       </div>
+
+      <div>
+        <p className="text-ink-900 mb-3 font-semibold">Manage site content</p>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {contentLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="border-line bg-surface hover:border-accent-500/50 rounded-2xl border p-4 transition-colors hover:shadow-sm"
+            >
+              <p className="text-ink-900 font-medium">{link.label}</p>
+              <p className="text-ink-500 mt-0.5 text-xs">{link.description}</p>
+            </Link>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
+
+const contentLinks = [
+  {
+    href: "/admin/listings",
+    label: "Listings",
+    description: "Every property, status and flags",
+  },
+  {
+    href: "/admin/file-rates",
+    label: "File rates",
+    description: "DHA plot file demand rates",
+  },
+  { href: "/admin/areas", label: "Areas", description: "Societies, phases and guides" },
+  { href: "/admin/agents", label: "Agents", description: "Public agent profiles" },
+  {
+    href: "/admin/posts",
+    label: "Blog posts",
+    description: "Guides and market analysis",
+  },
+  {
+    href: "/admin/services",
+    label: "Services",
+    description: "Construction, design, valuation…",
+  },
+  {
+    href: "/admin/projects",
+    label: "Projects",
+    description: "Developments on /projects",
+  },
+  {
+    href: "/admin/reviews",
+    label: "Reviews",
+    description: "Testimonials and agent ratings",
+  },
+];

@@ -57,6 +57,69 @@ export async function getFileRates(city = "Lahore"): Promise<FileRatePhaseGroup[
   return Array.from(groups.values());
 }
 
+export interface AdminFileRateRow extends FileRateRow {
+  locationId: string;
+  locationLabel: string;
+  updatedAt: Date;
+}
+
+export async function getAllFileRates(): Promise<AdminFileRateRow[]> {
+  const rates = await db.fileRate.findMany({
+    orderBy: [{ phase: "asc" }, { plotType: "asc" }, { areaSqft: "asc" }],
+    include: {
+      location: { select: { id: true, name: true, parent: { select: { name: true } } } },
+    },
+  });
+  return rates.map((r) => ({
+    id: r.id,
+    phase: r.phase,
+    plotType: r.plotType,
+    sizeLabel: r.sizeLabel,
+    areaSqft: r.areaSqft,
+    fileType: r.fileType,
+    demandPkr: r.demandPkr === null ? null : Number(r.demandPkr),
+    callForPrice: r.callForPrice,
+    trend: r.trend,
+    contactName: r.contactName,
+    contactPhone: r.contactPhone,
+    effectiveDate: r.effectiveDate,
+    locationId: r.location.id,
+    locationLabel: r.location.parent
+      ? `${r.location.name}, ${r.location.parent.name}`
+      : r.location.name,
+    updatedAt: r.updatedAt,
+  }));
+}
+
+export async function getFileRateForEdit(id: string): Promise<AdminFileRateRow | null> {
+  const r = await db.fileRate.findUnique({
+    where: { id },
+    include: {
+      location: { select: { id: true, name: true, parent: { select: { name: true } } } },
+    },
+  });
+  if (!r) return null;
+  return {
+    id: r.id,
+    phase: r.phase,
+    plotType: r.plotType,
+    sizeLabel: r.sizeLabel,
+    areaSqft: r.areaSqft,
+    fileType: r.fileType,
+    demandPkr: r.demandPkr === null ? null : Number(r.demandPkr),
+    callForPrice: r.callForPrice,
+    trend: r.trend,
+    contactName: r.contactName,
+    contactPhone: r.contactPhone,
+    effectiveDate: r.effectiveDate,
+    locationId: r.location.id,
+    locationLabel: r.location.parent
+      ? `${r.location.name}, ${r.location.parent.name}`
+      : r.location.name,
+    updatedAt: r.updatedAt,
+  };
+}
+
 export interface FileRateHistoryPoint {
   demandPkr: number | null;
   effectiveDate: Date;

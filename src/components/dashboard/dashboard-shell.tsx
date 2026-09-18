@@ -10,6 +10,13 @@ import {
   Users,
   ShieldCheck,
   Inbox,
+  Home,
+  TrendingUp,
+  MapPin,
+  Contact,
+  Newspaper,
+  Wrench,
+  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -32,6 +39,13 @@ const iconMap = {
   users: Users,
   shield: ShieldCheck,
   inbox: Inbox,
+  listings: Home,
+  fileRates: TrendingUp,
+  areas: MapPin,
+  agents: Contact,
+  posts: Newspaper,
+  services: Wrench,
+  reviews: Star,
 } as const;
 
 export type DashboardIconKey = keyof typeof iconMap;

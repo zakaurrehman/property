@@ -34,7 +34,7 @@ export default async function EditListingPage({
           mode="edit"
           defaultValues={result.input}
           defaultLocationLabel={result.locationLabel}
-          onSubmit={(values) => updateProperty(id, values)}
+          onSubmit={updateProperty.bind(null, id)}
         />
       </div>
     </div>

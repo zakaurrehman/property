@@ -22,6 +22,41 @@ export async function getProjects(): Promise<ProjectSummary[]> {
   }));
 }
 
+export interface AdminProjectRow extends ProjectSummary {
+  id: string;
+  updatedAt: Date;
+}
+
+export async function getAllProjects(): Promise<AdminProjectRow[]> {
+  const projects = await db.project.findMany({ orderBy: { updatedAt: "desc" } });
+  return projects.map((p) => ({
+    id: p.id,
+    slug: p.slug,
+    name: p.name,
+    description: p.description,
+    locationText: p.locationText,
+    status: p.status,
+    coverImage: p.coverImage,
+    updatedAt: p.updatedAt,
+  }));
+}
+
+export async function getProjectForEdit(id: string) {
+  const p = await db.project.findUnique({ where: { id } });
+  if (!p) return null;
+  return {
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    description: p.description,
+    locationText: p.locationText,
+    status: p.status,
+    coverImage: p.coverImage,
+    gallery: p.gallery,
+    completionDate: p.completionDate,
+  };
+}
+
 export interface ProjectDetail extends ProjectSummary {
   gallery: string[];
   completionDate: Date | null;

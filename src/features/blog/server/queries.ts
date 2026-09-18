@@ -55,6 +55,59 @@ export async function getPostBySlug(slug: string): Promise<BlogPostDetail | null
   };
 }
 
+export interface AdminPostRow {
+  id: string;
+  slug: string;
+  title: string;
+  publishedAt: Date | null;
+  updatedAt: Date;
+  authorName: string;
+}
+
+/** Every post, drafts included, for the admin table. */
+export async function getAllPosts(): Promise<AdminPostRow[]> {
+  const posts = await db.post.findMany({
+    orderBy: { updatedAt: "desc" },
+    include: { author: { select: { name: true } } },
+  });
+  return posts.map((p) => ({
+    id: p.id,
+    slug: p.slug,
+    title: p.title,
+    publishedAt: p.publishedAt,
+    updatedAt: p.updatedAt,
+    authorName: p.author.name,
+  }));
+}
+
+export interface PostEditData {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  contentMdx: string;
+  coverImage: string;
+  tags: string[];
+  readingMinutes: number;
+  published: boolean;
+}
+
+export async function getPostForEdit(id: string): Promise<PostEditData | null> {
+  const p = await db.post.findUnique({ where: { id } });
+  if (!p) return null;
+  return {
+    id: p.id,
+    title: p.title,
+    slug: p.slug,
+    excerpt: p.excerpt,
+    contentMdx: p.contentMdx,
+    coverImage: p.coverImage,
+    tags: p.tags,
+    readingMinutes: p.readingMinutes,
+    published: p.publishedAt !== null,
+  };
+}
+
 export async function getRelatedPosts(slug: string, tags: string[], limit = 3) {
   return db.post
     .findMany({

@@ -141,6 +141,7 @@ export async function updateProperty(
   });
 
   revalidatePath("/dashboard/listings");
+  revalidatePath("/admin/listings");
   revalidatePath(`/properties/${property.slug}`);
   return { ok: true, data: { slug: property.slug } };
 }
@@ -159,5 +160,8 @@ export async function deleteProperty(propertyId: string): Promise<ActionResult<n
 
   await db.property.delete({ where: { id: propertyId } });
   revalidatePath("/dashboard/listings");
+  revalidatePath("/admin/listings");
+  revalidatePath("/admin/moderation");
+  revalidatePath("/properties");
   return { ok: true, data: null };
 }

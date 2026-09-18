@@ -136,6 +136,88 @@ export async function getLocationGuide(slug: string): Promise<LocationGuide | nu
   };
 }
 
+export interface AdminLocationRow {
+  id: string;
+  slug: string;
+  name: string;
+  type: string;
+  depth: number;
+  propertyCount: number;
+  fileRateCount: number;
+  childCount: number;
+  avgPricePerMarla: number | null;
+  updatedAt: Date;
+}
+
+/** Whole location tree flattened depth-first, so the admin table can indent by depth. */
+export async function getLocationTree(): Promise<AdminLocationRow[]> {
+  const all = await db.location.findMany({
+    orderBy: [{ popularityRank: "asc" }, { name: "asc" }],
+    include: {
+      _count: { select: { properties: true, fileRates: true, children: true } },
+    },
+  });
+
+  const byParent = new Map<string | null, typeof all>();
+  for (const loc of all) {
+    const key = loc.parentId ?? null;
+    if (!byParent.has(key)) byParent.set(key, []);
+    byParent.get(key)!.push(loc);
+  }
+
+  const rows: AdminLocationRow[] = [];
+  const walk = (parentId: string | null, depth: number) => {
+    for (const loc of byParent.get(parentId) ?? []) {
+      rows.push({
+        id: loc.id,
+        slug: loc.slug,
+        name: loc.name,
+        type: loc.type,
+        depth,
+        propertyCount: loc._count.properties,
+        fileRateCount: loc._count.fileRates,
+        childCount: loc._count.children,
+        avgPricePerMarla:
+          loc.avgPricePerMarla === null ? null : Number(loc.avgPricePerMarla),
+        updatedAt: loc.updatedAt,
+      });
+      walk(loc.id, depth + 1);
+    }
+  };
+  walk(null, 0);
+  return rows;
+}
+
+export interface LocationParentOption {
+  id: string;
+  label: string;
+}
+
+export async function getLocationParentOptions(): Promise<LocationParentOption[]> {
+  const tree = await getLocationTree();
+  return tree.map((l) => ({ id: l.id, label: `${"— ".repeat(l.depth)}${l.name}` }));
+}
+
+export async function getLocationForEdit(id: string) {
+  const l = await db.location.findUnique({ where: { id } });
+  if (!l) return null;
+  return {
+    id: l.id,
+    name: l.name,
+    nameUr: l.nameUr,
+    slug: l.slug,
+    type: l.type,
+    parentId: l.parentId,
+    description: l.description,
+    heroImage: l.heroImage,
+    mapImageUrl: l.mapImageUrl,
+    avgPricePerMarla: l.avgPricePerMarla === null ? null : Number(l.avgPricePerMarla),
+    lat: l.lat,
+    lng: l.lng,
+    popularityRank: l.popularityRank,
+  };
+}
+
 const AREA_PAGE_SIZE = 24;
 
 export async function getPropertiesForLocationIds(

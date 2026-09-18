@@ -5,7 +5,71 @@ import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/guards";
 import { slugify } from "@/lib/slugify";
 import type { ActionResult } from "@/types/action-result";
-import { Role } from "@/generated/prisma/enums";
+import { Role, PropertyStatus } from "@/generated/prisma/enums";
+
+const listingStatusValues = Object.values(PropertyStatus) as string[];
+
+function revalidateListing(slug: string) {
+  revalidatePath("/admin/listings");
+  revalidatePath("/admin/moderation");
+  revalidatePath("/dashboard/listings");
+  revalidatePath("/properties");
+  revalidatePath(`/properties/${slug}`);
+  revalidatePath("/");
+}
+
+export async function setListingStatus(
+  propertyId: string,
+  status: string,
+): Promise<ActionResult<null>> {
+  await requireAdmin();
+  if (!listingStatusValues.includes(status)) {
+    return { ok: false, error: "Invalid status." };
+  }
+
+  const existing = await db.property.findUnique({
+    where: { id: propertyId },
+    select: { slug: true, publishedAt: true },
+  });
+  if (!existing) return { ok: false, error: "Listing not found." };
+
+  await db.property.update({
+    where: { id: propertyId },
+    data: {
+      status: status as PropertyStatus,
+      // First time a listing goes live, stamp it so "newest" sorting works.
+      ...(status === "ACTIVE" && !existing.publishedAt
+        ? { publishedAt: new Date() }
+        : {}),
+    },
+  });
+
+  revalidateListing(existing.slug);
+  return { ok: true, data: null };
+}
+
+export type ListingFlag = "isFeatured" | "isHot" | "isVerified";
+
+export async function setListingFlag(
+  propertyId: string,
+  flag: ListingFlag,
+  value: boolean,
+): Promise<ActionResult<null>> {
+  await requireAdmin();
+  if (!["isFeatured", "isHot", "isVerified"].includes(flag)) {
+    return { ok: false, error: "Invalid flag." };
+  }
+
+  const existing = await db.property.findUnique({
+    where: { id: propertyId },
+    select: { slug: true },
+  });
+  if (!existing) return { ok: false, error: "Listing not found." };
+
+  await db.property.update({ where: { id: propertyId }, data: { [flag]: value } });
+  revalidateListing(existing.slug);
+  return { ok: true, data: null };
+}
 
 export async function moderateProperty(
   propertyId: string,

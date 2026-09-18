@@ -155,13 +155,34 @@ This app is built in phases. Each phase ends with a green
       boundary rule on `/file-rates` (fixed by restructuring, not patching);
       a `<li key={area}>` broke on agents whose seeded `areasServed` has a
       duplicate (seed's random `pick()` can choose the same phase twice).
-- [ ] Phase 8 — Tools (mortgage, ROI, valuation, price trends)
+- [x] **Admin content management** (2026-09-18): every public content type is
+      now editable from `/admin` instead of living only in the seed —
+      **Listings** (all properties, status select, featured/hot/verified
+      toggles, edit via the listing wizard), **File rates** (create/edit/delete;
+      a price change auto-sets the trend arrow and records a `FileRateHistory`
+      point), **Areas** (the city → society → phase tree, with a delete guard
+      for areas that still have listings/rates/children), **Agents** (public
+      profile fields, featured flag), **Blog posts** (draft/publish toggle,
+      Markdown body), **Services** (icon picker, Markdown, gallery),
+      **Projects**, and **Reviews** (approve/hide toggle; approving/deleting
+      recomputes the agent's rating and review count). Each is a Zod schema +
+      Server Actions + react-hook-form form under its `features/<type>/`
+      folder, with `features/*/server/queries.ts` exposing admin list/edit
+      reads. Shared bits: `components/dashboard/delete-button.tsx` (confirm
+      dialog around a Server Action passed as a prop) and `page-header.tsx`.
+      Edit pages bind the record id with `updateX.bind(null, id)` — an inline
+      arrow from a Server Component isn't serialisable, which also fixed the
+      Phase 6 listing edit page. Verified with a 29-check Playwright run
+      (create → edit → public page reflects it → delete, per type). Still
+      hardcoded, not admin-editable: office address/hours on `/contact` and
+      the footer, and `NEXT_PUBLIC_*` contact numbers (env vars).
 - [ ] Phase 8 — Tools (mortgage, ROI, valuation, price trends)
 - [ ] Phase 9 — Polish (animation, dark mode/RTL/360px QA, SEO, PWA, Lighthouse)
 - [ ] Phase 10 — Ship (Playwright green, clean build, deploy)
 
-Most mega-menu / footer links point to routes that land in later phases and
-will 404 until then — `/properties` and `/properties/[slug]` are live now.
+Header/footer links that still 404 until their phase lands: `/about`,
+`/careers`, `/reviews`, `/faq`, `/profile`, `/maps`, and the `/tools/*`
+calculators (Phase 8).
 
 ## Demo accounts
 

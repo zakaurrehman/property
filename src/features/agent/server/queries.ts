@@ -49,6 +49,30 @@ export async function getAgents(): Promise<AgentListItem[]> {
   }));
 }
 
+export async function getAgentForEdit(id: string) {
+  const a = await db.agent.findUnique({
+    where: { id },
+    include: { user: { select: { name: true, email: true } } },
+  });
+  if (!a) return null;
+  return {
+    id: a.id,
+    slug: a.slug,
+    name: a.user.name,
+    title: a.title,
+    bio: a.bio,
+    photo: a.photo,
+    phone: a.phone,
+    whatsapp: a.whatsapp,
+    email: a.email,
+    specialisations: a.specialisations,
+    languages: a.languages,
+    yearsExperience: a.yearsExperience,
+    areasServed: a.areasServed,
+    isFeatured: a.isFeatured,
+  };
+}
+
 export interface AgentReview {
   id: string;
   authorName: string;
