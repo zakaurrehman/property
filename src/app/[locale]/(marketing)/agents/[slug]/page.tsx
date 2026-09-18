@@ -1,18 +1,14 @@
 import type { Metadata } from "next";
+import { localizedAlternates, socialImage } from "@/lib/seo";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Mail, MapPin, MessageCircle, Phone, Star } from "lucide-react";
-import { getAgentBySlug, getAgents } from "@/features/agent/server/queries";
+import { getAgentBySlug } from "@/features/agent/server/queries";
 import { PropertyGrid } from "@/features/property/components/property-grid";
 import { Badge } from "@/components/ui/badge";
 import { formatEnumLabel } from "@/lib/format";
 import { formatRelativeDate } from "@/lib/format";
 import { buildTelLink, buildWhatsAppLink } from "@/lib/whatsapp";
-
-export async function generateStaticParams() {
-  const agents = await getAgents();
-  return agents.map((a) => ({ slug: a.slug }));
-}
 
 export async function generateMetadata({
   params,
@@ -22,7 +18,12 @@ export async function generateMetadata({
   const { slug } = await params;
   const agent = await getAgentBySlug(slug);
   if (!agent) return {};
-  return { title: agent.name, description: agent.bio };
+  return {
+    title: agent.name,
+    description: agent.bio,
+    alternates: localizedAlternates(`/agents/${slug}`),
+    ...socialImage(agent.photo, agent.name),
+  };
 }
 
 export default async function AgentDetailPage({

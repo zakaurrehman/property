@@ -11,7 +11,10 @@ import { Badge } from "@/components/ui/badge";
 import { formatEnumLabel, formatRelativeDate } from "@/lib/format";
 import { Link } from "@/i18n/navigation";
 
-export const metadata: Metadata = { title: "My Account" };
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+  title: "My Account",
+};
 
 export default async function ProfilePage() {
   const sessionUser = await requireUser();

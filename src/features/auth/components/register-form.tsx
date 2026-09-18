@@ -41,11 +41,17 @@ export function RegisterForm() {
       return;
     }
 
-    await signIn("credentials", {
+    const signedIn = await signIn("credentials", {
       email: values.email,
       password: values.password,
       redirect: false,
     });
+    // The account exists either way; if auto sign-in hiccups, send them to
+    // log in rather than landing them on the homepage without a session.
+    if (!signedIn || signedIn.error || signedIn.url?.includes("/api/auth/error")) {
+      router.push("/login");
+      return;
+    }
     router.push("/");
     router.refresh();
   }

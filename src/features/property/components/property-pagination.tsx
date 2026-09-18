@@ -38,6 +38,7 @@ export function PropertyPagination({
       <Link
         href={hrefForPage(searchParams, Math.max(1, page - 1))}
         aria-disabled={page === 1}
+        aria-label="Previous page"
         className={cn(
           "border-line text-ink-600 hover:bg-accent hover:text-accent-foreground flex size-9 items-center justify-center rounded-md border",
           page === 1 && "pointer-events-none opacity-40",
@@ -69,6 +70,7 @@ export function PropertyPagination({
       <Link
         href={hrefForPage(searchParams, Math.min(totalPages, page + 1))}
         aria-disabled={page === totalPages}
+        aria-label="Next page"
         className={cn(
           "border-line text-ink-600 hover:bg-accent hover:text-accent-foreground flex size-9 items-center justify-center rounded-md border",
           page === totalPages && "pointer-events-none opacity-40",

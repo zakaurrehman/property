@@ -37,6 +37,14 @@ export function LoginForm() {
       setServerError("Invalid email or password.");
       return;
     }
+    // A server-side failure inside authorize (e.g. the database being down)
+    // doesn't come back as `error` — Auth.js reports ok:true with the URL of
+    // its error page. Treat that as a failed sign-in rather than navigating
+    // away without a session.
+    if (result.url?.includes("/api/auth/error")) {
+      setServerError("We couldn't sign you in right now — please try again in a moment.");
+      return;
+    }
     router.push(callbackUrl);
     router.refresh();
   }

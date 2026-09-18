@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { localizedAlternates } from "@/lib/seo";
 import Markdown from "react-markdown";
 import { HelpCircle } from "lucide-react";
 import { getPublishedFaqs } from "@/features/faq/server/queries";
@@ -11,8 +12,10 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Link } from "@/i18n/navigation";
+import { JsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
+  alternates: localizedAlternates("/faq"),
   title: "FAQ",
   description:
     "Answers to common questions about buying, selling and renting in DHA Lahore — plot files, file rates, overseas buying and our fees.",
@@ -20,9 +23,21 @@ export const metadata: Metadata = {
 
 export default async function FaqPage() {
   const groups = await getPublishedFaqs();
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: groups.flatMap((g) =>
+      g.items.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: { "@type": "Answer", text: item.answer },
+      })),
+    ),
+  };
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+      {groups.length > 0 && <JsonLd data={faqJsonLd} />}
       <div className="mb-10 text-center">
         <h1 className="font-heading text-ink-900 text-3xl font-bold sm:text-4xl">
           Frequently Asked Questions

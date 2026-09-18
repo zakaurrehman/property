@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { localizedAlternates } from "@/lib/seo";
 import { MortgageCalculator } from "@/features/tools/mortgage-calculator";
 
 export const metadata: Metadata = {
+  alternates: localizedAlternates("/tools/mortgage-calculator"),
   title: "Mortgage Calculator",
   description:
     "Work out the monthly payment on a Pakistani home loan — price, down payment, KIBOR-based rate and tenure.",

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { localizedAlternates } from "@/lib/seo";
 import Markdown from "react-markdown";
 import { Building2, MapPin, Star, Users } from "lucide-react";
 import { getAboutStats, getSitePage } from "@/features/site-page/server/queries";
@@ -8,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 
 export const metadata: Metadata = {
+  alternates: localizedAlternates("/about"),
   title: "About Us",
   description:
     "Estate Bureau — verified DHA Lahore listings, real file rates, and consultants who answer.",

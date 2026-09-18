@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
+import { localizedAlternates } from "@/lib/seo";
 import { getSitePage } from "@/features/site-page/server/queries";
 import { LegalPage } from "@/features/site-page/components/legal-page";
 
-export const metadata: Metadata = { title: "Terms of Use" };
+export const metadata: Metadata = {
+  alternates: localizedAlternates("/terms"),
+  title: "Terms of Use",
+};
 
 export default async function TermsPage() {
   const page = await getSitePage("terms");

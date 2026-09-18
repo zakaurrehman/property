@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { localizedAlternates } from "@/lib/seo";
 import { getFileRateTrends } from "@/features/file-rate/server/queries";
 import { PriceTrendsChart } from "@/features/tools/price-trends-chart";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 
 export const metadata: Metadata = {
+  alternates: localizedAlternates("/tools/price-trends"),
   title: "Price Trends",
   description:
     "How DHA Lahore plot file demand rates have moved over time, phase by phase.",

@@ -1,16 +1,12 @@
 import type { Metadata } from "next";
+import { localizedAlternates, socialImage } from "@/lib/seo";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import Markdown from "react-markdown";
-import { getServiceBySlug, getServices } from "@/features/service/server/queries";
+import { getServiceBySlug } from "@/features/service/server/queries";
 import { serviceIconMap, FallbackIcon } from "@/lib/lucide-icon";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-
-export async function generateStaticParams() {
-  const services = await getServices();
-  return services.map((s) => ({ slug: s.slug }));
-}
 
 export async function generateMetadata({
   params,
@@ -20,7 +16,12 @@ export async function generateMetadata({
   const { slug } = await params;
   const service = await getServiceBySlug(slug);
   if (!service) return {};
-  return { title: service.name, description: service.summary };
+  return {
+    title: service.name,
+    description: service.summary,
+    alternates: localizedAlternates(`/services/${slug}`),
+    ...socialImage(service.gallery[0], service.name),
+  };
 }
 
 export default async function ServiceDetailPage({

@@ -1,20 +1,14 @@
 import type { Metadata } from "next";
+import { absoluteUrl, getSiteUrl, localizedAlternates, socialImage } from "@/lib/seo";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import Markdown from "react-markdown";
-import {
-  getPostBySlug,
-  getPublishedPosts,
-  getRelatedPosts,
-} from "@/features/blog/server/queries";
+import { getPostBySlug, getRelatedPosts } from "@/features/blog/server/queries";
 import { formatRelativeDate, formatReadingTime } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@/i18n/navigation";
-
-export async function generateStaticParams() {
-  const posts = await getPublishedPosts();
-  return posts.map((p) => ({ slug: p.slug }));
-}
+import { siteConfig } from "@/lib/site-config";
+import { JsonLd } from "@/components/seo/json-ld";
 
 export async function generateMetadata({
   params,
@@ -24,7 +18,18 @@ export async function generateMetadata({
   const { slug } = await params;
   const post = await getPostBySlug(slug);
   if (!post) return {};
-  return { title: post.title, description: post.excerpt };
+  return {
+    title: post.title,
+    description: post.excerpt,
+    alternates: localizedAlternates(`/blog/${slug}`),
+    ...socialImage(post.coverImage, post.title),
+    openGraph: {
+      type: "article",
+      publishedTime: post.publishedAt.toISOString(),
+      authors: [post.authorName],
+      images: [{ url: post.coverImage, alt: post.title }],
+    },
+  };
 }
 
 export default async function BlogPostPage({
@@ -37,9 +42,22 @@ export default async function BlogPostPage({
   if (!post) notFound();
 
   const related = await getRelatedPosts(post.slug, post.tags);
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.excerpt,
+    image: post.coverImage,
+    datePublished: post.publishedAt.toISOString(),
+    author: { "@type": "Person", name: post.authorName },
+    publisher: { "@type": "Organization", name: siteConfig.name, url: getSiteUrl() },
+    mainEntityOfPage: absoluteUrl(`/blog/${post.slug}`),
+    keywords: post.tags.join(", "),
+  };
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+      <JsonLd data={articleJsonLd} />
       <div className="mb-4 flex flex-wrap gap-1.5">
         {post.tags.map((tag) => (
           <Badge key={tag} variant="secondary">

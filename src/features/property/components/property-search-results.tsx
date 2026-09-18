@@ -6,7 +6,19 @@ import { List, MapIcon, Columns2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PropertyGrid } from "./property-grid";
 import { PropertyCard } from "./property-card";
-import { PropertyMap } from "@/features/map/components/property-map";
+import dynamic from "next/dynamic";
+
+// MapLibre is ~300 KiB of JS; only the split/map views need it, so keep it
+// out of the list view's bundle and render it client-side on demand.
+const PropertyMap = dynamic(
+  () => import("@/features/map/components/property-map").then((m) => m.PropertyMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="bg-surface-2 border-line h-full w-full animate-pulse rounded-2xl border" />
+    ),
+  },
+);
 import type { PropertyCardData } from "../server/queries";
 
 const viewOptions = ["list", "map", "split"] as const;

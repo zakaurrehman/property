@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -71,6 +71,12 @@ export function HeroSearch() {
           <TabsTrigger value="files">{t("tabFiles")}</TabsTrigger>
           <TabsTrigger value="commercial">{t("tabCommercial")}</TabsTrigger>
         </TabsList>
+        {/* The tabs only switch the search intent — there are no panels. Radix
+            still points each trigger's aria-controls at a panel id, so mount
+            empty hidden panels to keep the references valid for AT/axe. */}
+        {(["buy", "rent", "plots", "files", "commercial"] as const).map((value) => (
+          <TabsContent key={value} value={value} forceMount className="hidden" />
+        ))}
       </Tabs>
 
       <form onSubmit={handleSearch} className="grid gap-3 sm:grid-cols-4">
@@ -88,7 +94,10 @@ export function HeroSearch() {
         </div>
 
         <Select value={type} onValueChange={setType}>
-          <SelectTrigger className="bg-surface h-11 w-full">
+          <SelectTrigger
+            className="bg-surface h-11 w-full"
+            aria-label={t("searchTypeLabel")}
+          >
             <SelectValue placeholder={t("searchTypeLabel")} />
           </SelectTrigger>
           <SelectContent>
@@ -101,7 +110,10 @@ export function HeroSearch() {
         </Select>
 
         <Select value={beds} onValueChange={setBeds}>
-          <SelectTrigger className="bg-surface h-11 w-full">
+          <SelectTrigger
+            className="bg-surface h-11 w-full"
+            aria-label={t("searchBedsLabel")}
+          >
             <SelectValue placeholder={t("searchBedsLabel")} />
           </SelectTrigger>
           <SelectContent>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { absoluteUrl, localizedAlternates, socialImage } from "@/lib/seo";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ChevronRight, MapPin } from "lucide-react";
@@ -9,6 +10,7 @@ import {
 import { PropertyGrid } from "@/features/property/components/property-grid";
 import { formatPkrFull } from "@/lib/currency";
 import { Link } from "@/i18n/navigation";
+import { JsonLd } from "@/components/seo/json-ld";
 
 export async function generateMetadata({
   params,
@@ -22,6 +24,8 @@ export async function generateMetadata({
     title: `${guide.name} — Area Guide`,
     description:
       guide.description ?? `Properties, price trends and phases in ${guide.name}.`,
+    alternates: localizedAlternates(`/areas/${slug.join("/")}`),
+    ...socialImage(guide.heroImage, guide.name),
   };
 }
 
@@ -36,9 +40,24 @@ export default async function AreaGuidePage({
   if (!guide) notFound();
 
   const results = await getPropertiesForLocationIds(guide.descendantLocationIds);
+  const trail = [...guide.breadcrumbs, { slug: guide.slug, name: guide.name }];
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Areas", item: absoluteUrl("/areas") },
+      ...trail.map((crumb, i) => ({
+        "@type": "ListItem",
+        position: i + 2,
+        name: crumb.name,
+        item: absoluteUrl(`/areas/lahore/${crumb.slug}`),
+      })),
+    ],
+  };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+      <JsonLd data={breadcrumbJsonLd} />
       <nav className="text-ink-500 mb-4 flex flex-wrap items-center gap-1 text-sm">
         <Link href="/areas" className="hover:text-ink-900">
           Areas

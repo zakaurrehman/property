@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { localizedAlternates } from "@/lib/seo";
 import { Mail, MapPin, Phone, Clock } from "lucide-react";
 import { ContactForm } from "@/features/lead/components/contact-form";
 import { siteConfig } from "@/lib/site-config";
 import { buildTelLink, buildWhatsAppLink } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
+  alternates: localizedAlternates("/contact"),
   title: "Contact Us",
   description:
     "Get in touch with Estate Bureau — DHA Lahore's property specialists. Call, WhatsApp, or send us a message.",

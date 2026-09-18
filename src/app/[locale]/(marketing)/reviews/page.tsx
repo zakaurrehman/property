@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { localizedAlternates } from "@/lib/seo";
 import Image from "next/image";
 import { Star } from "lucide-react";
 import { getAgentOptions, getPublicReviews } from "@/features/review/server/queries";
@@ -10,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { Link } from "@/i18n/navigation";
 
 export const metadata: Metadata = {
+  alternates: localizedAlternates("/reviews"),
   title: "Reviews",
   description: "What buyers, sellers and landlords say about working with Estate Bureau.",
 };

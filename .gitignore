@@ -44,6 +44,7 @@ next-env.d.ts
 # playwright / vitest
 /playwright-report/
 /test-results/
+/playwright/.cache/
 /coverage/
 
 # editor

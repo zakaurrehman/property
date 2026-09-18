@@ -23,18 +23,27 @@
   --brand-600: #1a4a86;
   --brand-500: #2860a8;
 
-  --accent-600: #a8871a;
+  /* 700/600 are the text-safe golds (>= 4.5:1 on --surface); 500/400 are for
+     fills and accents, never body-size text. */
+  --accent-700: #7f6510;
+  --accent-600: #8a6d12;
   --accent-500: #c9a227;
   --accent-400: #d9b95a;
 
-  --emerald-500: #0f8a6a;
+  --emerald-500: #0d7d60; /* 5.1:1 with white text — badges and the WhatsApp CTA */
   --emerald-100: #e2f5ef;
   --rose-500: #c0392b;
   --rose-100: #fbe7e5;
 
+  /* Full ink scale — every step here is used as a text-* utility somewhere;
+     an undefined step silently renders in the inherited colour (Tailwind v4
+     emits nothing for unknown colours). 400 is the lightest AA text step. */
   --ink-900: #0a0f1a;
+  --ink-700: #2d3748;
   --ink-600: #4a5568;
-  --ink-400: #8a94a6;
+  --ink-500: #5b6678;
+  --ink-400: #5f6a7e;
+  --ink-300: #a0aab8;
 
   --surface: #ffffff;
   --surface-2: #f6f7f9;
@@ -79,11 +88,17 @@
   --ring: var(--accent-500);
   --radius: var(--radius-md);
 
-  --chart-1: var(--brand-700);
-  --chart-2: var(--accent-500);
-  --chart-3: var(--emerald-500);
-  --chart-4: var(--rose-500);
-  --chart-5: var(--brand-500);
+  /* Chart series — categorical order is the CVD-safety mechanism (validated
+     against this surface with the dataviz palette validator); assign by
+     entity, never by rank, never past slot 6. */
+  --chart-1: #2a78d6;
+  --chart-2: #eb6834;
+  --chart-3: #1baf7a;
+  --chart-4: #eda100;
+  --chart-5: #e87ba4;
+  --chart-6: #008300;
+  --chart-grid: #e7eaf0;
+  --chart-axis: #c3c2b7;
 
   --sidebar: var(--surface);
   --sidebar-foreground: var(--ink-900);
@@ -102,8 +117,14 @@
   --line: #202a40;
 
   --ink-900: #f3f5f8;
+  --ink-700: #d3dae5;
   --ink-600: #b7c0cf;
+  --ink-500: #9aa6b8;
   --ink-400: #7d8aa0;
+  --ink-300: #4f5b70;
+
+  --accent-700: #e0c46a;
+  --accent-600: #d4ae3a;
 
   --brand-700: #dbe6f5;
 
@@ -130,11 +151,14 @@
   --input: var(--line);
   --ring: var(--accent-500);
 
-  --chart-1: var(--accent-500);
-  --chart-2: var(--brand-500);
-  --chart-3: var(--emerald-500);
-  --chart-4: var(--rose-500);
-  --chart-5: var(--accent-400);
+  --chart-1: #3987e5;
+  --chart-2: #d95926;
+  --chart-3: #199e70;
+  --chart-4: #c98500;
+  --chart-5: #d55181;
+  --chart-6: #008300;
+  --chart-grid: #202a40;
+  --chart-axis: #383835;
 
   --sidebar: var(--surface-2);
   --sidebar-foreground: var(--ink-900);
@@ -172,6 +196,7 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
 
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
@@ -187,6 +212,7 @@
   --color-brand-700: var(--brand-700);
   --color-brand-600: var(--brand-600);
   --color-brand-500: var(--brand-500);
+  --color-accent-700: var(--accent-700);
   --color-accent-600: var(--accent-600);
   --color-accent-500: var(--accent-500);
   --color-accent-400: var(--accent-400);
@@ -195,8 +221,11 @@
   --color-rose-500: var(--rose-500);
   --color-rose-100: var(--rose-100);
   --color-ink-900: var(--ink-900);
+  --color-ink-700: var(--ink-700);
   --color-ink-600: var(--ink-600);
+  --color-ink-500: var(--ink-500);
   --color-ink-400: var(--ink-400);
+  --color-ink-300: var(--ink-300);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);

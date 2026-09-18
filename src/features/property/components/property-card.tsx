@@ -27,10 +27,13 @@ export function PropertyCard({
   property,
   highlighted = false,
   onHover,
+  priority = false,
 }: {
   property: PropertyCardData;
   highlighted?: boolean;
   onHover?: (id: string | null) => void;
+  /** Above-the-fold cards: eager + fetchpriority=high so the grid's LCP image isn't lazy-loaded. */
+  priority?: boolean;
 }) {
   const cover = property.media[0];
   // Saved/compare state lives in localStorage, which the server can't see —
@@ -71,6 +74,7 @@ export function PropertyCard({
               alt={cover.alt ?? property.title}
               fill
               sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+              priority={priority}
               className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (

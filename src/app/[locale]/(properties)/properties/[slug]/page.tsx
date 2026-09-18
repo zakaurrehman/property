@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { absoluteUrl, localizedAlternates, socialImage } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
 import {
@@ -21,7 +23,6 @@ import { AreaBadge } from "@/components/shared/area-badge";
 import { getAmenityIcon } from "@/lib/amenity-icons";
 import { getAmenityDisplay } from "@/lib/amenity-catalog";
 import { formatRelativeDate } from "@/lib/format";
-import { siteConfig } from "@/lib/site-config";
 import {
   getPropertyBySlug,
   getSimilarProperties,
@@ -44,10 +45,14 @@ export async function generateMetadata({
   return {
     title: property.seoTitle ?? property.title,
     description: property.seoDescription ?? property.description.slice(0, 160),
+    alternates: localizedAlternates(`/properties/${slug}`),
+    ...socialImage(property.media[0]?.url, property.title),
     openGraph: {
       title: property.title,
       description: property.description.slice(0, 160),
-      images: property.media[0] ? [property.media[0].url] : undefined,
+      images: property.media[0]
+        ? [{ url: property.media[0].url, alt: property.title }]
+        : undefined,
     },
   };
 }
@@ -115,22 +120,32 @@ export default async function PropertyDetailPage({
     "@type": "RealEstateListing",
     name: property.title,
     description: property.description,
-    url: `${siteConfig.url}/properties/${property.slug}`,
+    url: absoluteUrl(`/properties/${property.slug}`),
     datePosted: property.publishedAt?.toISOString(),
     image: property.media.map((m) => m.url),
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: property.address,
+      addressLocality: city?.name ?? "Lahore",
+      addressCountry: "PK",
+    },
+    floorSize: {
+      "@type": "QuantitativeValue",
+      value: property.areaSqft,
+      unitCode: "FTK",
+    },
+    ...(property.bedrooms != null ? { numberOfRooms: property.bedrooms } : {}),
     offers: {
       "@type": "Offer",
       price: property.priceOnRequest ? undefined : property.price.toString(),
       priceCurrency: "PKR",
+      availability: "https://schema.org/InStock",
     },
   };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
 
       <nav
         aria-label="Breadcrumb"

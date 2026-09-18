@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { sortOptions } from "../schema";
 
 const typeOptions = [
@@ -89,6 +89,10 @@ export function SearchFilters() {
           <TabsTrigger value="SALE">Buy</TabsTrigger>
           <TabsTrigger value="RENT">Rent</TabsTrigger>
         </TabsList>
+        {/* Segmented control, no panels — keep aria-controls targets in the DOM. */}
+        {(["ALL", "SALE", "RENT"] as const).map((value) => (
+          <TabsContent key={value} value={value} forceMount className="hidden" />
+        ))}
       </Tabs>
 
       <div className="flex flex-wrap items-center gap-2">
@@ -103,7 +107,7 @@ export function SearchFilters() {
           value={filters.type || "ANY"}
           onValueChange={(v) => setFilters({ type: v === "ANY" ? null : v, page: null })}
         >
-          <SelectTrigger className="bg-surface h-10">
+          <SelectTrigger className="bg-surface h-10" aria-label="Property type">
             <SelectValue placeholder="Type" />
           </SelectTrigger>
           <SelectContent>
@@ -126,7 +130,7 @@ export function SearchFilters() {
         </Button>
 
         <Select value={filters.sort} onValueChange={(v) => setFilters({ sort: v })}>
-          <SelectTrigger className="bg-surface h-10 sm:ml-auto">
+          <SelectTrigger className="bg-surface h-10 sm:ml-auto" aria-label="Sort results">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

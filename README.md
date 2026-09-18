@@ -40,7 +40,7 @@ Prisma Postgres instead (see `.env.example`).
 | `pnpm format` / `format:check` | Prettier                            |
 | `pnpm typecheck`               | `tsc --noEmit`                      |
 | `pnpm test:unit`               | Vitest                              |
-| `pnpm test:e2e`                | Playwright (Phase 10)               |
+| `pnpm test:e2e`                | Playwright e2e (needs a seeded DB)  |
 | `pnpm db:dev`                  | Start local Postgres (`prisma dev`) |
 | `pnpm db:migrate`              | Create/apply a migration            |
 | `pnpm db:generate`             | Regenerate the Prisma client        |
@@ -200,8 +200,47 @@ This app is built in phases. Each phase ends with a green
       clean build. Still open from Phase 8: valuation _tool_ (the
       `/valuation` request form exists; an instant estimate from file rates
       does not).
-- [ ] Phase 9 — Polish (animation, dark mode/RTL/360px QA, SEO, PWA, Lighthouse)
-- [ ] Phase 10 — Ship (Playwright green, clean build, deploy)
+- [x] **Phase 9 — Polish** (2026-09-19): **SEO** — `sitemap.xml` (request-time,
+      every public route + listing/area/agent/post/service/project/career with
+      en/ur hreflang pairs), `robots.txt`, per-page canonical + hreflang via
+      `localizedAlternates()`, Open Graph/Twitter images on detail pages, and
+      JSON-LD (`RealEstateAgent` site-wide, `RealEstateListing`, `BlogPosting`,
+      `JobPosting`, `FAQPage`, `BreadcrumbList`) through a sanitising
+      `<JsonLd>` — the Phase 3 listing block used raw `JSON.stringify`, an XSS
+      hole for agent-entered descriptions. The public origin comes from
+      `getSiteUrl()`: `NEXT_PUBLIC_SITE_URL`, else Vercel's production domain,
+      so a blank variable no longer yields localhost canonicals. **PWA** —
+      `manifest.ts`, generated icons (192/512/maskable/apple), SVG favicon.
+      **QA** — a 360px sweep of every route in light, dark and Urdu found zero
+      horizontal overflow. **Lighthouse** (desktop, production build): Best
+      Practices 100 and SEO 100 across the board, Accessibility 97–100
+      (from 85–91), Performance 80–94. Fixes behind those numbers: the ink
+      scale was missing `ink-700/500/300` and `accent-700` even though 94
+      usages existed — Tailwind v4 emits nothing for unknown colours, so all
+      that "muted" text had been rendering in the body colour; every step now
+      exists with AA-checked values (`ink-400`, `accent-600`, `emerald-500`
+      darkened). Radix segmented-control tabs got hidden panels so
+      `aria-controls` resolves; selects, pagination arrows and the phase
+      picker got names; the first row of property cards is `priority` so the
+      LCP image isn't lazy; MapLibre is `next/dynamic` so list view never
+      ships it; validated `--chart-1..6` tokens (the earlier insert had
+      silently failed on CRLF and the leftover shadcn defaults were in use).
+      Not done: page-transition animation (framer-motion is only used in the
+      chat widget) and the instant-valuation tool.
+- [x] **Phase 10 — Ship** (2026-09-19): Playwright suite in `e2e/` (65 tests —
+      every public route on desktop + mobile, RTL, redirects, SEO/PWA
+      endpoints, structured data, search + filters, enquiry submission, the
+      mortgage calculator, and admin login → FAQ create/publish/delete → listing
+      status round trip). `pnpm test:e2e` builds and starts the app itself;
+      set `PLAYWRIGHT_BASE_URL` to target a running server. CI now has an
+      `e2e` job with a Postgres service (migrate → seed → build → test).
+      Along the way: CI had been red since Phase 6 — `pnpm/action-setup`
+      refuses a `version:` input once `package.json#packageManager` exists —
+      and `generateStaticParams` on four detail routes made `next build` need
+      a live database (removed; the routes are dynamic anyway). Auth.js needed
+      `trustHost: true`: outside Vercel every `/api/auth/*` call failed with
+      `UntrustedHost`, and the login form treated that as success — it now
+      checks for Auth.js's error-page URL, as does post-registration sign-in.
 
 Every header/footer link resolves. Run `pnpm db:seed` on a fresh database to
 get the starter FAQs and site-page copy; an existing database gets the same

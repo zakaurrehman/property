@@ -5,6 +5,7 @@ import { getLocale } from "next-intl/server";
 import { LoginForm } from "@/features/auth/components/login-form";
 
 export const metadata: Metadata = {
+  robots: { index: false, follow: false },
   title: "Log In",
   description: "Log in to your Estate Bureau account.",
 };

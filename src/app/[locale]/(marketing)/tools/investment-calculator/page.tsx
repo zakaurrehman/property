@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { localizedAlternates } from "@/lib/seo";
 import { InvestmentCalculator } from "@/features/tools/investment-calculator";
 
 export const metadata: Metadata = {
+  alternates: localizedAlternates("/tools/investment-calculator"),
   title: "Investment Calculator",
   description:
     "Project the return on a DHA Lahore plot, file or house — appreciation, rental yield, holding period and transaction costs.",

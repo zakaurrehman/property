@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { localizedAlternates } from "@/lib/seo";
 import { getAgents } from "@/features/agent/server/queries";
 import { AgentCard } from "@/features/agent/components/agent-card";
 
 export const metadata: Metadata = {
+  alternates: localizedAlternates("/agents"),
   title: "Our Agents",
   description:
     "Meet the Estate Bureau team — verified property consultants across DHA Lahore.",

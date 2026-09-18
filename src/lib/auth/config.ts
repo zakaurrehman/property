@@ -18,6 +18,12 @@ export const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(db),
   session: { strategy: "jwt" },
   secret: env.AUTH_SECRET,
+  // Auth.js only auto-trusts the Host header on Vercel; anywhere else in
+  // production (CI's Playwright run, Docker, a VPS) every /api/auth/* call
+  // fails with UntrustedHost and sign-in silently breaks. The host is only
+  // used to build callback URLs, and the app always sits behind a proxy that
+  // sets it, so trusting it is the standard self-hosting setting.
+  trustHost: true,
   pages: {
     signIn: "/login",
   },

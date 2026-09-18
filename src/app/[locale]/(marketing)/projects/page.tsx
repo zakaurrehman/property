@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { localizedAlternates } from "@/lib/seo";
 import Image from "next/image";
 import { Building } from "lucide-react";
 import { getProjects } from "@/features/project/server/queries";
@@ -7,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "@/i18n/navigation";
 
 export const metadata: Metadata = {
+  alternates: localizedAlternates("/projects"),
   title: "Projects",
   description:
     "Master-planned developments across DHA Lahore — from balloting to handover.",

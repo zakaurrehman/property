@@ -5,6 +5,7 @@ import { getLocale } from "next-intl/server";
 import { RegisterForm } from "@/features/auth/components/register-form";
 
 export const metadata: Metadata = {
+  robots: { index: false, follow: false },
   title: "Create Account",
   description:
     "Create a free Estate Bureau account to save properties and track enquiries.",

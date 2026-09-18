@@ -19,6 +19,8 @@ import { getAdvisorAgent } from "@/features/chat/server/queries";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { siteConfig } from "@/lib/site-config";
+import { getSiteUrl } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
 import "../globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -47,21 +49,42 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "home" });
 
   return {
-    metadataBase: new URL(siteConfig.url),
+    metadataBase: new URL(getSiteUrl()),
     title: {
       default: `${siteConfig.name} — ${t("heroTitle")}`,
       template: `%s | ${siteConfig.name}`,
     },
     description: t("heroSubtitle"),
-    alternates: {
-      languages: { en: "/en", ur: "/ur" },
-    },
+    // No layout-level `alternates`: pages set their own hreflang/canonical
+    // via localizedAlternates(); an inherited one here would point every
+    // page's hreflang at the homepage.
     openGraph: {
       siteName: siteConfig.name,
       type: "website",
+      locale: locale === "ur" ? "ur_PK" : "en_PK",
     },
+    twitter: { card: "summary_large_image" },
   };
 }
+
+/** Site-wide schema.org entity — DHA Lahore brokerage. */
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgent",
+  name: siteConfig.name,
+  url: getSiteUrl(),
+  telephone: siteConfig.phone,
+  email: siteConfig.email,
+  areaServed: { "@type": "City", name: "Lahore" },
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "123 Main Boulevard, DHA Phase 5",
+    addressLocality: "Lahore",
+    addressRegion: "Punjab",
+    addressCountry: "PK",
+  },
+  openingHours: "Mo-Sa 09:00-18:00",
+};
 
 export const viewport: Viewport = {
   themeColor: [
@@ -114,6 +137,7 @@ export default async function LocaleLayout({
                     <FloatingCtas />
                     <CommandPalette />
                     <AdvisorChatWidget agent={advisorAgent} />
+                    <JsonLd data={organizationJsonLd} />
                     <Toaster />
                   </TooltipProvider>
                 </QueryProvider>

@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { localizedAlternates } from "@/lib/seo";
 import { ArrowRight } from "lucide-react";
 import { getServices } from "@/features/service/server/queries";
 import { serviceIconMap, FallbackIcon } from "@/lib/lucide-icon";
 import { Link } from "@/i18n/navigation";
 
 export const metadata: Metadata = {
+  alternates: localizedAlternates("/services"),
   title: "Services",
   description:
     "Construction, architecture, interior design, investment consulting, property management and valuation services in DHA Lahore.",

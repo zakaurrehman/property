@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { localizedAlternates } from "@/lib/seo";
 import { MessageCircle } from "lucide-react";
 import { getFileRates } from "@/features/file-rate/server/queries";
 import { TrendIndicator } from "@/features/file-rate/components/trend-indicator";
@@ -22,6 +23,7 @@ import {
 import { Link } from "@/i18n/navigation";
 
 export const metadata: Metadata = {
+  alternates: localizedAlternates("/file-rates"),
   title: "DHA Lahore File Rates",
   description:
     "Live plot file demand rates across DHA Lahore phases — updated regularly by our research team.",
@@ -54,6 +56,7 @@ export default async function FileRatesPage() {
         )}
       </div>
 
+      <h2 className="sr-only">Rates by phase</h2>
       <Accordion
         type="multiple"
         defaultValue={groups[0] ? [groups[0].phase] : []}
@@ -74,7 +77,7 @@ export default async function FileRatesPage() {
               {group.locationSlug && (
                 <Link
                   href={`/areas/lahore/dha-lahore/${group.locationSlug}`}
-                  className="text-accent-600 mb-3 inline-block text-xs font-medium hover:underline"
+                  className="text-accent-600 mb-1 inline-flex min-h-11 items-center text-xs font-medium hover:underline"
                 >
                   View area guide →
                 </Link>

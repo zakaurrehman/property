@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { localizedAlternates } from "@/lib/seo";
 import { getTranslations } from "next-intl/server";
 import { ShieldCheck, Users2, MessagesSquare, TrendingUp } from "lucide-react";
 import { HeroSearch } from "@/features/search/components/hero-search";
@@ -8,6 +9,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: t("heroTitle"),
     description: t("heroSubtitle"),
+    alternates: localizedAlternates("/"),
   };
 }
 

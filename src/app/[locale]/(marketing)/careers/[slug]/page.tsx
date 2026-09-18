@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getSiteUrl, localizedAlternates } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import Markdown from "react-markdown";
 import { Briefcase, MapPin } from "lucide-react";
@@ -6,6 +7,8 @@ import { getCareerBySlug } from "@/features/career/server/queries";
 import { ApplicationForm } from "@/features/career/components/application-form";
 import { Badge } from "@/components/ui/badge";
 import { formatEnumLabel } from "@/lib/format";
+import { siteConfig } from "@/lib/site-config";
+import { JsonLd } from "@/components/seo/json-ld";
 
 export async function generateMetadata({
   params,
@@ -15,7 +18,11 @@ export async function generateMetadata({
   const { slug } = await params;
   const job = await getCareerBySlug(slug);
   if (!job) return {};
-  return { title: `${job.title} — Careers`, description: job.description.slice(0, 160) };
+  return {
+    title: `${job.title} — Careers`,
+    description: job.description.slice(0, 160),
+    alternates: localizedAlternates(`/careers/${slug}`),
+  };
 }
 
 export default async function CareerDetailPage({
@@ -28,8 +35,31 @@ export default async function CareerDetailPage({
   // Closed roles keep their URL but aren't listed or applicable.
   if (!job || !job.isActive) notFound();
 
+  const jobJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
+    title: job.title,
+    description: job.description,
+    datePosted: job.createdAt.toISOString(),
+    employmentType: job.type,
+    hiringOrganization: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      sameAs: getSiteUrl(),
+    },
+    jobLocation: {
+      "@type": "Place",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: job.location,
+        addressCountry: "PK",
+      },
+    },
+  };
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+      <JsonLd data={jobJsonLd} />
       <div className="grid gap-10 lg:grid-cols-[1fr_400px]">
         <article>
           <div className="text-ink-500 mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">

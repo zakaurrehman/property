@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { localizedAlternates } from "@/lib/seo";
 import { ArrowRight, Briefcase, MapPin } from "lucide-react";
 import { getActiveCareers } from "@/features/career/server/queries";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -7,6 +8,7 @@ import { formatEnumLabel, formatRelativeDate } from "@/lib/format";
 import { Link } from "@/i18n/navigation";
 
 export const metadata: Metadata = {
+  alternates: localizedAlternates("/careers"),
   title: "Careers",
   description:
     "Open roles at Estate Bureau — sales, marketing, construction and operations in Lahore.",

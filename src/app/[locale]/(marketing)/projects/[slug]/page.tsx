@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
+import { localizedAlternates, socialImage } from "@/lib/seo";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { MapPin } from "lucide-react";
-import { getProjectBySlug, getProjects } from "@/features/project/server/queries";
+import { getProjectBySlug } from "@/features/project/server/queries";
 import { Badge } from "@/components/ui/badge";
 import { formatRelativeDate } from "@/lib/format";
-
-export async function generateStaticParams() {
-  const projects = await getProjects();
-  return projects.map((p) => ({ slug: p.slug }));
-}
 
 export async function generateMetadata({
   params,
@@ -19,7 +15,12 @@ export async function generateMetadata({
   const { slug } = await params;
   const project = await getProjectBySlug(slug);
   if (!project) return {};
-  return { title: project.name, description: project.description };
+  return {
+    title: project.name,
+    description: project.description,
+    alternates: localizedAlternates(`/projects/${slug}`),
+    ...socialImage(project.coverImage, project.name),
+  };
 }
 
 export default async function ProjectDetailPage({

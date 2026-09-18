@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { localizedAlternates } from "@/lib/seo";
 import Image from "next/image";
 import { MapPin } from "lucide-react";
 import { getAreaIndex } from "@/features/location/server/queries";
@@ -6,6 +7,7 @@ import { formatPkrFull } from "@/lib/currency";
 import { Link } from "@/i18n/navigation";
 
 export const metadata: Metadata = {
+  alternates: localizedAlternates("/areas"),
   title: "Area Guides",
   description:
     "Explore DHA Lahore and the city's top societies — prices, phases and listings.",

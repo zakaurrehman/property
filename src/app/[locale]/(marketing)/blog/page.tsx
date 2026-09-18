@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { localizedAlternates } from "@/lib/seo";
 import Image from "next/image";
 import { Newspaper } from "lucide-react";
 import { getPublishedPosts } from "@/features/blog/server/queries";
@@ -7,6 +8,7 @@ import { formatRelativeDate, formatReadingTime } from "@/lib/format";
 import { Link } from "@/i18n/navigation";
 
 export const metadata: Metadata = {
+  alternates: localizedAlternates("/blog"),
   title: "Blog",
   description: "Buying guides, price trends and market analysis for DHA Lahore.",
 };

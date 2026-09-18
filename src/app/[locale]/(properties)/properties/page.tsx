@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { localizedAlternates } from "@/lib/seo";
 import { parsePropertySearchParams } from "@/features/property/schema";
 import { searchProperties } from "@/features/property/server/queries";
 import { SearchFilters } from "@/features/property/components/search-filters";
@@ -6,6 +7,7 @@ import { PropertySearchResults } from "@/features/property/components/property-s
 import { PropertyPagination } from "@/features/property/components/property-pagination";
 
 export const metadata: Metadata = {
+  alternates: localizedAlternates("/properties"),
   title: "Properties for Sale & Rent in DHA Lahore",
   description:
     "Browse verified houses, plots, plot files and commercial properties across DHA Lahore and surrounding societies.",

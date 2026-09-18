@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { localizedAlternates } from "@/lib/seo";
 import { ClipboardCheck, TrendingUp, Users } from "lucide-react";
 import { ValuationForm } from "@/features/lead/components/valuation-form";
 
 export const metadata: Metadata = {
+  alternates: localizedAlternates("/valuation"),
   title: "Free Property Valuation",
   description:
     "Get a free, no-obligation valuation of your DHA Lahore property — grounded in real file rates and recent transactions.",
