@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { omitEmptyValues } from "./env-normalize";
 
 /**
  * Central env contract. Most integrations are wired up in later build
@@ -59,7 +60,8 @@ const envSchema = z.object({
 export type Env = z.infer<typeof envSchema>;
 
 function loadEnv(): Env {
-  const parsed = envSchema.safeParse(process.env);
+  // Blank values (Vercel placeholders, `KEY=` lines) count as unset — see env-normalize.ts.
+  const parsed = envSchema.safeParse(omitEmptyValues(process.env));
 
   if (!parsed.success) {
     const issues = parsed.error.issues
