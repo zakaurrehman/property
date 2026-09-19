@@ -45,10 +45,32 @@ const nextConfig: NextConfig = {
     // header/footer link predates it. A config redirect is a real 308 — a
     // redirect() inside a page can only emit a meta-refresh once the root
     // layout has started streaming.
-    return [
+    const redirects = [
       { source: "/maps", destination: "/properties?view=map", permanent: true },
       { source: "/ur/maps", destination: "/ur/properties?view=map", permanent: true },
     ];
+
+    // Once a custom domain is the production URL, the *.vercel.app alias
+    // still serves the whole site — a duplicate for search engines. Send it
+    // to the real host. Production only: preview deployments live on
+    // *.vercel.app and must keep working.
+    const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+      (process.env.VERCEL_PROJECT_PRODUCTION_URL
+        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+        : "");
+    const onCustomDomain =
+      siteUrl !== "" && !new URL(siteUrl).host.endsWith(".vercel.app");
+    if (process.env.VERCEL_ENV === "production" && onCustomDomain) {
+      redirects.push({
+        source: "/:path*",
+        has: [{ type: "host", value: ".*\\.vercel\\.app" }],
+        destination: `${siteUrl.replace(/\/$/, "")}/:path*`,
+        permanent: true,
+      } as (typeof redirects)[number]);
+    }
+
+    return redirects;
   },
 };
 
