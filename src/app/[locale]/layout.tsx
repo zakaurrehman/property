@@ -78,12 +78,17 @@ const organizationJsonLd = {
   areaServed: { "@type": "City", name: "Lahore" },
   address: {
     "@type": "PostalAddress",
-    streetAddress: "123 Main Boulevard, DHA Phase 5",
-    addressLocality: "Lahore",
+    streetAddress: siteConfig.address.street,
+    addressLocality: siteConfig.address.city,
     addressRegion: "Punjab",
     addressCountry: "PK",
   },
   openingHours: "Mo-Sa 09:00-18:00",
+  employee: {
+    "@type": "Person",
+    name: siteConfig.leadership.ceo.name,
+    jobTitle: siteConfig.leadership.ceo.title,
+  },
 };
 
 export const viewport: Viewport = {

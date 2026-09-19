@@ -14,8 +14,8 @@ const envSchema = z.object({
   // Public site
   NEXT_PUBLIC_SITE_URL: z.string().url().default("http://localhost:3000"),
   NEXT_PUBLIC_SITE_NAME: z.string().default("Estate Bureau"),
-  NEXT_PUBLIC_WHATSAPP_NUMBER: z.string().default("+923000000000"),
-  NEXT_PUBLIC_CONTACT_PHONE: z.string().default("+924235000000"),
+  NEXT_PUBLIC_WHATSAPP_NUMBER: z.string().default("+923211199719"),
+  NEXT_PUBLIC_CONTACT_PHONE: z.string().default("+923211199719"),
   NEXT_PUBLIC_CONTACT_EMAIL: z.string().email().default("info@estatebureau.pk"),
 
   // Database

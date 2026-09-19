@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     "Get in touch with Estate Bureau — DHA Lahore's property specialists. Call, WhatsApp, or send us a message.",
 };
 
-const officeAddress = "123 Main Boulevard, DHA Phase 5, Lahore, Pakistan";
+const officeAddress = siteConfig.address.full;
 
 export default function ContactPage() {
   return (
@@ -45,6 +45,9 @@ export default function ContactPage() {
                     >
                       Get directions
                     </a>
+                    <span className="text-ink-500 mt-1 block text-xs">
+                      {siteConfig.leadership.ceo.name} · {siteConfig.leadership.ceo.title}
+                    </span>
                   </dd>
                 </div>
               </div>

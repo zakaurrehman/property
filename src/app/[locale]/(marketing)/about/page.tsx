@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { localizedAlternates } from "@/lib/seo";
 import Markdown from "react-markdown";
-import { Building2, MapPin, Star, Users } from "lucide-react";
+import { Building2, MapPin, MessageCircle, Phone, Star, Users } from "lucide-react";
 import { getAboutStats, getSitePage } from "@/features/site-page/server/queries";
 import { getAgents } from "@/features/agent/server/queries";
 import { AgentCard } from "@/features/agent/components/agent-card";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import { siteConfig } from "@/lib/site-config";
+import { buildTelLink, buildWhatsAppLink } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
   alternates: localizedAlternates("/about"),
@@ -61,6 +63,44 @@ export default async function AboutPage() {
       <article className="prose prose-neutral dark:prose-invert mx-auto max-w-3xl">
         <Markdown>{page.contentMdx}</Markdown>
       </article>
+
+      <section className="mt-16" aria-labelledby="leadership-heading">
+        <h2
+          id="leadership-heading"
+          className="font-heading text-ink-900 mb-6 text-2xl font-bold"
+        >
+          Leadership
+        </h2>
+        <div className="border-line bg-surface-2 flex flex-col gap-5 rounded-2xl border p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-heading text-ink-900 text-xl font-semibold">
+              {siteConfig.leadership.ceo.name}
+            </p>
+            <p className="text-accent-600 mt-1 text-sm font-medium">
+              {siteConfig.leadership.ceo.title}, {siteConfig.name}
+            </p>
+            <p className="text-ink-600 mt-2 text-sm">{siteConfig.address.full}</p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Button variant="outline" asChild>
+              <a href={buildTelLink(siteConfig.phone)}>
+                <Phone className="size-4" />
+                {siteConfig.phone}
+              </a>
+            </Button>
+            <Button asChild>
+              <a
+                href={buildWhatsAppLink(siteConfig.whatsapp)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <MessageCircle className="size-4" />
+                WhatsApp
+              </a>
+            </Button>
+          </div>
+        </div>
+      </section>
 
       {agents.length > 0 && (
         <section className="mt-16">

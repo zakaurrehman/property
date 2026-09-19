@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/guards";
+import { siteConfig } from "@/lib/site-config";
 import { slugify } from "@/lib/slugify";
 import type { ActionResult } from "@/types/action-result";
 import { Role, PropertyStatus } from "@/generated/prisma/enums";
@@ -127,8 +128,8 @@ export async function updateUserRole(
         title: "Property Consultant",
         bio: `${user.name} is a property consultant at Estate Bureau.`,
         photo: user.image ?? "https://picsum.photos/seed/agent-default/400/400",
-        phone: user.phone ?? "+923000000000",
-        whatsapp: user.phone ?? "+923000000000",
+        phone: user.phone ?? siteConfig.phone,
+        whatsapp: user.phone ?? siteConfig.whatsapp,
         email: user.email,
         languages: ["English", "Urdu"],
       },

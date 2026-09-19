@@ -33,7 +33,7 @@ const emptyDefaults: CareerFormInput = {
   title: "",
   slug: "",
   department: "Sales",
-  location: "DHA Phase 5, Lahore",
+  location: "DHA Phase 8, Lahore",
   type: "FULL_TIME",
   description: "",
   isActive: true,

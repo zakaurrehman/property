@@ -11,9 +11,18 @@
 export const siteConfig = {
   name: process.env.NEXT_PUBLIC_SITE_NAME || "Estate Bureau",
   url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-  whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "+923000000000",
-  phone: process.env.NEXT_PUBLIC_CONTACT_PHONE || "+924235000000",
+  whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "+923211199719",
+  phone: process.env.NEXT_PUBLIC_CONTACT_PHONE || "+923211199719",
   email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "info@estatebureau.pk",
+  /** Office address — the street line is what schema.org gets, the full line is for display. */
+  address: {
+    street: "16-C Broadway, DHA Phase 8",
+    city: "Lahore",
+    full: "16-C Broadway, DHA Phase 8, Lahore, Pakistan",
+  },
+  leadership: {
+    ceo: { name: "Sajid Iqbal", title: "Chief Executive Officer" },
+  },
   /** Raster tile URL template ({z}/{x}/{y}) — swap providers via env, no code change. */
   mapTilesUrl:
     process.env.NEXT_PUBLIC_MAP_TILES_URL ||

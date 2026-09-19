@@ -68,9 +68,7 @@ export async function Footer() {
             <dl className="text-ink-600 space-y-1 text-sm">
               <div>
                 <dt className="text-ink-900 inline font-medium">{t("office")}: </dt>
-                <dd className="inline">
-                  123 Main Boulevard, DHA Phase 5, Lahore, Pakistan
-                </dd>
+                <dd className="inline">{siteConfig.address.full}</dd>
               </div>
               <div>
                 <dt className="text-ink-900 inline font-medium">{t("hours")}: </dt>
