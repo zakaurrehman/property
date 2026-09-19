@@ -93,7 +93,9 @@ export function LocationPicker({
               </div>
             )}
             {!loading && query.trim().length >= 2 && (
-              <CommandEmpty>No locations found.</CommandEmpty>
+              <CommandEmpty>
+                No locations match — an admin can add it under Areas.
+              </CommandEmpty>
             )}
             <CommandGroup>
               {results.map((loc) => (

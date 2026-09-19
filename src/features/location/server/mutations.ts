@@ -116,3 +116,43 @@ export async function deleteLocation(id: string): Promise<ActionResult<null>> {
   revalidateAreas();
   return { ok: true, data: null };
 }
+
+/**
+ * One-click import of the standard Lahore tree (DHA phases + major
+ * societies) for a fresh database. Create-only by slug, so it is safe to run
+ * again after an admin has edited or added areas.
+ */
+export async function importReferenceLocations(): Promise<
+  ActionResult<{ created: number; skipped: number }>
+> {
+  await requireAdmin();
+  const { referenceLocations } = await import("../reference-data");
+
+  const existing = await db.location.findMany({ select: { id: true, slug: true } });
+  const idBySlug = new Map(existing.map((l) => [l.slug, l.id]));
+  let created = 0;
+
+  for (const ref of referenceLocations) {
+    if (idBySlug.has(ref.slug)) continue;
+    const parentId = ref.parentSlug ? (idBySlug.get(ref.parentSlug) ?? null) : null;
+    const loc = await db.location.create({
+      data: {
+        slug: ref.slug,
+        name: ref.name,
+        nameUr: ref.nameUr ?? null,
+        type: ref.type,
+        parentId,
+        lat: ref.lat ?? null,
+        lng: ref.lng ?? null,
+        popularityRank: ref.popularityRank ?? null,
+      },
+      select: { id: true },
+    });
+    idBySlug.set(ref.slug, loc.id);
+    created++;
+  }
+
+  revalidateAreas();
+  revalidatePath("/admin/file-rates/new");
+  return { ok: true, data: { created, skipped: referenceLocations.length - created } };
+}
