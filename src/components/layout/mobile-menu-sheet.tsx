@@ -26,7 +26,7 @@ export function MobileMenuSheet() {
           variant="ghost"
           size="icon"
           className="lg:hidden"
-          aria-label={t("company")}
+          aria-label={t("openMenu")}
         >
           <Menu className="size-5" />
         </Button>
@@ -34,7 +34,7 @@ export function MobileMenuSheet() {
       <SheetContent side="left" className="w-full max-w-xs overflow-y-auto">
         <SheetHeader>
           <SheetTitle asChild>
-            <Logo />
+            <Logo wordmark="always" />
           </SheetTitle>
         </SheetHeader>
         <nav className="flex flex-col gap-6 px-4 pb-8">

@@ -138,7 +138,7 @@ export function DashboardShell({
             <SheetContent side="left" className="w-full max-w-xs">
               <SheetHeader>
                 <SheetTitle asChild>
-                  <Logo />
+                  <Logo wordmark="always" />
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col gap-6 px-4 pb-8">

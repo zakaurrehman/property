@@ -60,7 +60,7 @@ export async function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_2fr_1.2fr]">
           <div className="flex flex-col gap-4">
-            <Logo />
+            <Logo wordmark="always" />
             <p className="text-ink-600 max-w-xs text-sm">
               Estate Bureau is Lahore&apos;s premium DHA property portal — verified
               listings, real file rates, agents who answer.
