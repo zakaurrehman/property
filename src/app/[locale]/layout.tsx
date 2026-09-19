@@ -84,6 +84,7 @@ const organizationJsonLd = {
     addressCountry: "PK",
   },
   openingHours: "Mo-Sa 09:00-18:00",
+  sameAs: Object.values(siteConfig.social),
   employee: {
     "@type": "Person",
     name: siteConfig.leadership.ceo.name,

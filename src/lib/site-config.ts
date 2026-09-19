@@ -23,6 +23,13 @@ export const siteConfig = {
   leadership: {
     ceo: { name: "Sajid Iqbal", title: "Chief Executive Officer" },
   },
+  /** Public profiles — footer icons and the organisation schema's sameAs. */
+  social: {
+    facebook: "https://www.facebook.com/dhaestatebureau",
+    instagram: "https://www.instagram.com/dhaestatebureau/",
+    youtube: "https://www.youtube.com/@dhaestatebureau",
+    tiktok: "https://www.tiktok.com/@dha.estate.bureau",
+  },
   /** Raster tile URL template ({z}/{x}/{y}) — swap providers via env, no code change. */
   mapTilesUrl:
     process.env.NEXT_PUBLIC_MAP_TILES_URL ||

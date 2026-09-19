@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import {
   FacebookIcon,
   InstagramIcon,
-  LinkedinIcon,
+  TiktokIcon,
   YoutubeIcon,
 } from "@/components/shared/social-icons";
 import { Link } from "@/i18n/navigation";
@@ -45,10 +45,10 @@ const seoLinkCloud = [
 ];
 
 const socials = [
-  { icon: FacebookIcon, href: "https://facebook.com", label: "Facebook" },
-  { icon: InstagramIcon, href: "https://instagram.com", label: "Instagram" },
-  { icon: LinkedinIcon, href: "https://linkedin.com", label: "LinkedIn" },
-  { icon: YoutubeIcon, href: "https://youtube.com", label: "YouTube" },
+  { icon: FacebookIcon, href: siteConfig.social.facebook, label: "Facebook" },
+  { icon: InstagramIcon, href: siteConfig.social.instagram, label: "Instagram" },
+  { icon: YoutubeIcon, href: siteConfig.social.youtube, label: "YouTube" },
+  { icon: TiktokIcon, href: siteConfig.social.tiktok, label: "TikTok" },
 ];
 
 export async function Footer() {
