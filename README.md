@@ -280,5 +280,12 @@ pnpm db:create-admin --email you@example.com --password "a long passphrase" --na
 ```
 
 Running it again for the same email promotes the account to admin and
-replaces the password. Everything else — locations, listings, file rates,
+replaces the password. Set the URL in the shell only — do **not** put the
+production URL in `.env` (or `.env.production.local`, which `next build`/
+`pnpm test:e2e` load): `pnpm db:seed` wipes whatever database `.env` points
+at. It refuses non-local hosts unless `ALLOW_REMOTE_SEED=1`, as a backstop.
+
+Once signed in, open **Admin → Areas** and press **Import DHA phases &
+societies** to load the standard Lahore location tree — listings and file
+rates need a phase or society to attach to. Everything else — locations, listings, file rates,
 pages, FAQs, team — is entered through `/admin`.

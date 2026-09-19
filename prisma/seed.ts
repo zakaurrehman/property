@@ -5,7 +5,28 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { amenityCatalog } from "../src/lib/amenity-catalog";
 import { faqDefaults, sitePageDefaults } from "../src/features/site-page/defaults";
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+// This script deletes every table before re-filling it with demo data. It
+// exists for local development; refuse anything that is not a local
+// database unless the operator says so explicitly.
+const url = process.env.DATABASE_URL ?? "";
+const host = (() => {
+  try {
+    return new URL(url.replace(/^postgres(ql)?:/, "http:")).hostname;
+  } catch {
+    return "";
+  }
+})();
+const isLocal = ["localhost", "127.0.0.1", "::1"].includes(host);
+if (!isLocal && process.env.ALLOW_REMOTE_SEED !== "1") {
+  console.error(
+    `Refusing to seed "${host || "unknown host"}": it is not a local database and ` +
+      "this script wipes every table first. If you really mean it, run with " +
+      "ALLOW_REMOTE_SEED=1.",
+  );
+  process.exit(1);
+}
+
+const adapter = new PrismaPg({ connectionString: url });
 const db = new PrismaClient({ adapter });
 
 // Deterministic PRNG so re-seeding is reproducible.
