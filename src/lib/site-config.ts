@@ -13,7 +13,7 @@ export const siteConfig = {
   url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
   whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "+923211199719",
   phone: process.env.NEXT_PUBLIC_CONTACT_PHONE || "+923211199719",
-  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "info@estatebureau.pk",
+  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "dhaestatebureau@gmail.com",
   /** Office address — the street line is what schema.org gets, the full line is for display. */
   address: {
     street: "16-C Broadway, DHA Phase 8",

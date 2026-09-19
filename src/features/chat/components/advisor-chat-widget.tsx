@@ -11,6 +11,7 @@ import { useHasMounted } from "@/lib/hooks/use-has-mounted";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/lib/site-config";
+import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
 import { createChatLead } from "@/features/lead/server/actions";
 import type { ChatLeadInput } from "@/features/lead/schema";
 import type { AdvisorAgent } from "../server/queries";
@@ -250,6 +251,7 @@ export function AdvisorChatWidget({ agent }: { agent: AdvisorAgent | null }) {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
+                      <WhatsAppIcon className="size-4" />
                       Continue on WhatsApp
                     </a>
                   </Button>

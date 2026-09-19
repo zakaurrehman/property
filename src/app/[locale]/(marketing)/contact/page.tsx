@@ -3,6 +3,7 @@ import { localizedAlternates } from "@/lib/seo";
 import { Mail, MapPin, Phone, Clock } from "lucide-react";
 import { ContactForm } from "@/features/lead/components/contact-form";
 import { siteConfig } from "@/lib/site-config";
+import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
 import { buildTelLink, buildWhatsAppLink } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
@@ -98,6 +99,7 @@ export default function ContactPage() {
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-6 py-4 font-medium text-white shadow-sm transition-transform hover:scale-[1.01]"
           >
+            <WhatsAppIcon className="size-5" />
             Chat on WhatsApp
           </a>
 

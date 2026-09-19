@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { localizedAlternates } from "@/lib/seo";
-import { MessageCircle } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
 import { getFileRates } from "@/features/file-rate/server/queries";
 import { TrendIndicator } from "@/features/file-rate/components/trend-indicator";
 import { formatPkrFull } from "@/lib/currency";
@@ -120,7 +120,7 @@ export default async function FileRatesPage() {
                             rel="noopener noreferrer"
                             className="text-accent-600 inline-flex items-center gap-1 text-sm hover:underline"
                           >
-                            <MessageCircle className="size-3.5" />
+                            <WhatsAppIcon className="size-3.5" />
                             {row.contactName}
                           </a>
                         </TableCell>

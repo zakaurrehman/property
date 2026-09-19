@@ -18,6 +18,7 @@ import { PriceTag } from "@/components/shared/price-tag";
 import { AreaBadge } from "@/components/shared/area-badge";
 import { formatRelativeDate } from "@/lib/format";
 import { buildTelLink, buildWhatsAppLink, propertyWhatsAppMessage } from "@/lib/whatsapp";
+import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
 import { useUiStore } from "@/lib/store/ui-store";
 import { useHasMounted } from "@/lib/hooks/use-has-mounted";
 import { cn } from "@/lib/utils";
@@ -186,6 +187,7 @@ export function PropertyCard({
                 target="_blank"
                 rel="noopener noreferrer"
               >
+                <WhatsAppIcon className="size-3.5" />
                 WhatsApp
               </a>
             </Button>

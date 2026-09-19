@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { localizedAlternates, socialImage } from "@/lib/seo";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Mail, MapPin, MessageCircle, Phone, Star } from "lucide-react";
+import { Mail, MapPin, Phone, Star } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
 import { getAgentBySlug } from "@/features/agent/server/queries";
 import { PropertyGrid } from "@/features/property/components/property-grid";
 import { Badge } from "@/components/ui/badge";
@@ -69,7 +70,7 @@ export default async function AgentDetailPage({
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-600"
               >
-                <MessageCircle className="size-4" />
+                <WhatsAppIcon className="size-4" />
                 WhatsApp
               </a>
               <a

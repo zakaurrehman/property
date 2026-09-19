@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { buildTelLink, buildWhatsAppLink, propertyWhatsAppMessage } from "@/lib/whatsapp";
+import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
 import { PropertyEnquiryForm } from "@/features/lead/components/property-enquiry-form";
 import type { PropertyDetailData } from "../server/queries";
 
@@ -51,6 +52,7 @@ export function AgentContactCard({ property }: { property: PropertyDetailData })
             target="_blank"
             rel="noopener noreferrer"
           >
+            <WhatsAppIcon className="size-4" />
             WhatsApp
           </a>
         </Button>

@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { localizedAlternates } from "@/lib/seo";
 import Markdown from "react-markdown";
-import { Building2, MapPin, MessageCircle, Phone, Star, Users } from "lucide-react";
+import { Building2, MapPin, Phone, Star, Users } from "lucide-react";
 import { getAboutStats, getSitePage } from "@/features/site-page/server/queries";
 import { getAgents } from "@/features/agent/server/queries";
 import { AgentCard } from "@/features/agent/components/agent-card";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
 import { siteConfig } from "@/lib/site-config";
 import { buildTelLink, buildWhatsAppLink } from "@/lib/whatsapp";
 
@@ -94,7 +95,7 @@ export default async function AboutPage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <MessageCircle className="size-4" />
+                <WhatsAppIcon className="size-4" />
                 WhatsApp
               </a>
             </Button>
